@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">" Exhibition Explorer"</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="nav_txt_museum">Museum</string>
+    <string name="nav_txt_favorite">Favorite</string>
+    <string name="nav_txt_settings">Settings</string>
+    <string name="nav_txt_help_and_feedback"><![CDATA[Help & Feedback]]></string>
+    <string name="nav_txt_sign_in">Sign In</string>
+    <string name="nav_txt_sign_out">Sign Out</string>
+    <string name="nav_menu_others">Others</string>
 </resources>
