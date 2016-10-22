@@ -5,4 +5,5 @@ package hu.bme.aut.exhibitionexplorer.interfaces;
  */
 
 public interface OnSuccesfullLoginListener {
+    public void onSuccesfullLogin();
 }

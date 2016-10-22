@@ -1,5 +1,6 @@
 package hu.bme.aut.exhibitionexplorer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,8 +14,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
     Toolbar toolbar;
 
     @Override
@@ -23,6 +31,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         initNavigationDrawer();
     }
@@ -51,11 +62,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_help_and_feedbeck) {
 
         } else if (id == R.id.nav_sign_in) {
-
+            Intent startLoginActivity = new Intent(this, LoginActivity.class);
+            startActivity(startLoginActivity);
         } else if (id == R.id.nav_sign_out) {
-
+            mFirebaseAuth.signOut();
+            recreate();
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -70,7 +82,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.inflateMenu(R.menu.activity_main_drawer);
+        if(mFirebaseUser == null){
+            navigationView.inflateMenu(R.menu.activity_main_drawer);
+        } else {
+            navigationView.inflateMenu(R.menu.activity_main_drawer_signed_in);
+        }
         navigationView.inflateHeaderView(R.layout.nav_header_main);
         navigationView.setNavigationItemSelectedListener(this);
     }

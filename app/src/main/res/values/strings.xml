@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">" Exhibition Explorer"</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Exhibition Explorer</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -13,4 +13,15 @@
     <string name="nav_txt_sign_in">Sign In</string>
     <string name="nav_txt_sign_out">Sign Out</string>
     <string name="nav_menu_others">Others</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button_label">Sign In</string>
+    <string name="sign_up_text">Sign Up!</string>
+    <string name="login_error_message">Please make sure you enter an email address and password!</string>
+    <string name="login_error_title">Error!</string>
+    <string name="sign_up_button_label">Sign Up</string>
+    <string name="password_confirm_hint">Confirm password</string>
+    <string name="signup_error_message">Please make sure you enter an email address and password!</string>
+    <string name="confirm_email_error">Please make sure you enter the same password!</string>
+    <string name="signup_error_title">Error!</string>
 </resources>

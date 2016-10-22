@@ -1,14 +1,11 @@
 package hu.bme.aut.exhibitionexplorer.fragment;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import hu.bme.aut.exhibitionexplorer.R;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
 
 /**
  * Created by Adam on 2016. 10. 22..
@@ -34,6 +32,26 @@ public class SignInFragment extends Fragment{
     private Button btnSignIn;
     private TextView tvSignUp;
     private FirebaseAuth firebaseAuth;
+
+    private OnSignUpButtonClickListener listener;
+    private OnSuccesfullLoginListener onSuccesfullLoginListener;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FragmentActivity activity = getActivity();
+        if(activity instanceof OnSignUpButtonClickListener){
+            listener = (OnSignUpButtonClickListener) activity;
+        } else {
+            throw new RuntimeException("Activity must implement OnSignUpButtonCLickListener interface");
+        }
+
+        if(activity instanceof OnSuccesfullLoginListener){
+            onSuccesfullLoginListener = (OnSuccesfullLoginListener) activity;
+        } else {
+            throw new RuntimeException("Activity must implement OnSuccesFullLoginListener");
+        }
+    }
 
     @Nullable
     @Override
@@ -55,6 +73,12 @@ public class SignInFragment extends Fragment{
         setSignInButtonClickListener();
 
         tvSignUp = (TextView) rootView.findViewById(R.id.tvSignUp);
+        tvSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onSignUp();
+            }
+        });
     }
 
     private void setSignInButtonClickListener() {
@@ -75,7 +99,7 @@ public class SignInFragment extends Fragment{
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(getContext(), "LoginSuccesFull", Toast.LENGTH_SHORT);
+                                        onSuccesfullLoginListener.onSuccesfullLogin();
                                     } else {
                                         showSignInErrorAlertDialog(task);
                                     }
