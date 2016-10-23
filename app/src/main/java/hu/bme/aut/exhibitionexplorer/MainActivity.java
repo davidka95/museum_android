@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,6 +17,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_muesum) {
-
+            showFragment(new ExhibitionFragment(), ExhibitionFragment.TAG);
         } else if (id == R.id.nav_favorite) {
 
         } else if (id == R.id.nav_settings) {
@@ -72,6 +75,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showFragment(ExhibitionFragment exhibitionFragment, String tag) {
+        FragmentTransaction localFragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+        localFragmentTransaction.replace(R.id.content_main, exhibitionFragment, tag);
+        localFragmentTransaction.addToBackStack(null);
+
+        localFragmentTransaction.commit();
     }
 
     private void initNavigationDrawer(){
