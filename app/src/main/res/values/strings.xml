@@ -25,4 +25,11 @@
     <string name="signup_error_message">Please make sure you enter an email address and password!</string>
     <string name="confirm_email_error">Please make sure you enter the same password!</string>
     <string name="signup_error_title">Error!</string>
+    <string name="forgot_password_send_email">Send Email</string>
+    <string name="txt_reset_password">To reset your password, enter the email address you use to sign in to Exhibition Explorer.</string>
+    <string name="forgot_password_text">Forgot Password?</string>
+    <string name="forgot_password_miss_data_error_message">Please make sure you enter an email address!</string>
+    <string name="forgot_password_miss_data_error_title" >Error!</string>
+    <string name="forgot_password_succesfull_sent_email_message">An email has been sent to %1$s. Please check it!</string>
+    <string name="forgot_password_succesfull_sent_email_title">Check your email!</string>
 </resources>

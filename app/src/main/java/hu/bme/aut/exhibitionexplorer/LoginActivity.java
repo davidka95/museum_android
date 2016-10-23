@@ -14,11 +14,12 @@ import android.view.WindowManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import hu.bme.aut.exhibitionexplorer.fragment.ForgotPasswordFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.SignInFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.SignUpFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
 
-public class LoginActivity extends AppCompatActivity implements SignInFragment.OnSignUpButtonClickListener, OnSuccesfullLoginListener{
+public class LoginActivity extends AppCompatActivity implements SignInFragment.OnUserSettingsButtonClickListener, OnSuccesfullLoginListener{
     FragmentManager fragmentManager;
     Toolbar toolbar;
 
@@ -58,6 +59,15 @@ public class LoginActivity extends AppCompatActivity implements SignInFragment.O
         Fragment signUpFragment = new SignUpFragment();
         fragmentManager.beginTransaction().replace(R.id.activity_login, signUpFragment, SignUpFragment.TAG)
                 .addToBackStack(SignUpFragment.TAG)
+                .commit();
+    }
+
+    @Override
+    public void onForgotPassword() {
+        fragmentManager = getSupportFragmentManager();
+        Fragment signUpFragment = new ForgotPasswordFragment();
+        fragmentManager.beginTransaction().replace(R.id.activity_login, signUpFragment, ForgotPasswordFragment.TAG)
+                .addToBackStack(ForgotPasswordFragment.TAG)
                 .commit();
     }
 

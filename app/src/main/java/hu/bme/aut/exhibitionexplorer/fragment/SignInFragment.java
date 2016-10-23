@@ -29,19 +29,23 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
 public class SignInFragment extends Fragment{
     private EditText edEmail;
     private EditText edPassword;
+
     private Button btnSignIn;
+
     private TextView tvSignUp;
+    private TextView tvForgotPassword;
+
     private FirebaseAuth firebaseAuth;
 
-    private OnSignUpButtonClickListener listener;
+    private OnUserSettingsButtonClickListener listener;
     private OnSuccesfullLoginListener onSuccesfullLoginListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FragmentActivity activity = getActivity();
-        if(activity instanceof OnSignUpButtonClickListener){
-            listener = (OnSignUpButtonClickListener) activity;
+        if(activity instanceof OnUserSettingsButtonClickListener){
+            listener = (OnUserSettingsButtonClickListener) activity;
         } else {
             throw new RuntimeException("Activity must implement OnSignUpButtonCLickListener interface");
         }
@@ -77,6 +81,14 @@ public class SignInFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 listener.onSignUp();
+            }
+        });
+
+        tvForgotPassword = (TextView) rootView.findViewById(R.id.tvForgotPassword);
+        tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onForgotPassword();
             }
         });
     }
@@ -129,8 +141,9 @@ public class SignInFragment extends Fragment{
         dialog.show();
     }
 
-    public interface OnSignUpButtonClickListener{
+    public interface OnUserSettingsButtonClickListener{
         public void onSignUp();
+        public void onForgotPassword();
     }
 
 
