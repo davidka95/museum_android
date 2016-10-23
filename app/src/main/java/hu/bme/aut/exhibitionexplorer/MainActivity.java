@@ -97,5 +97,7 @@ public class MainActivity extends AppCompatActivity
         }
         navigationView.inflateHeaderView(R.layout.nav_header_main);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_exhibition);
+        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_exhibition));
     }
 }

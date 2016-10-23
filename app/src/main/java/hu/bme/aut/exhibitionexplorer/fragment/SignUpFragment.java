@@ -26,6 +26,7 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
  */
 
 public class SignUpFragment extends Fragment {
+    public static final String TAG = "SignUpFragment";
     private FirebaseAuth firebaseAuth;
     private EditText edEmail;
     private EditText edPassword;
