@@ -28,13 +28,25 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        if(mFirebaseUser == null){
+            loadLoginActivity();
+        }
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         initNavigationDrawer();
+    }
+
+    private void loadLoginActivity() {
+        Intent startLoginActivity = new Intent(this, LoginActivity.class);
+        startLoginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startLoginActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(startLoginActivity);
     }
 
     @Override

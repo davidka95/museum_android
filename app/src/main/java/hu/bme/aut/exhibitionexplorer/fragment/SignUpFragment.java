@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,12 +27,18 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
  */
 
 public class SignUpFragment extends Fragment {
+
     public static final String TAG = "SignUpFragment";
+
     private FirebaseAuth firebaseAuth;
+
     private EditText edEmail;
     private EditText edPassword;
     private EditText edPasswordConfirm;
+
     private Button btnSignUp;
+
+    private TextView tvBack;
 
     private OnSuccesfullLoginListener onSuccesfullLoginListener;
 
@@ -40,7 +47,7 @@ public class SignUpFragment extends Fragment {
         super.onCreate(savedInstanceState);
         FragmentActivity activity = getActivity();
 
-        if(activity instanceof OnSuccesfullLoginListener){
+        if (activity instanceof OnSuccesfullLoginListener) {
             onSuccesfullLoginListener = (OnSuccesfullLoginListener) activity;
         } else {
             throw new RuntimeException("Activity must implement OnSuccesFullLoginListener");
@@ -63,6 +70,14 @@ public class SignUpFragment extends Fragment {
         edEmail = (EditText) rootView.findViewById(R.id.edEmail);
         edPassword = (EditText) rootView.findViewById(R.id.edPassword);
         edPasswordConfirm = (EditText) rootView.findViewById(R.id.edPasswordConfirm);
+
+        tvBack = (TextView) rootView.findViewById(R.id.tvBack);
+        tvBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         btnSignUp = (Button) rootView.findViewById(R.id.btnSIgnUp);
         setSignUpClickListener();
@@ -92,7 +107,7 @@ public class SignUpFragment extends Fragment {
                                     if (task.isSuccessful()) {
                                         onSuccesfullLoginListener.onSuccesfullLogin();
                                     } else {
-                                       showSignInErrorAlertDialog(task);
+                                        showSignInErrorAlertDialog(task);
                                     }
                                 }
                             });

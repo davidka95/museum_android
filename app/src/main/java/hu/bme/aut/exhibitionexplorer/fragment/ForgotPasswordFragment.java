@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,6 +26,7 @@ import hu.bme.aut.exhibitionexplorer.R;
  */
 
 public class ForgotPasswordFragment extends Fragment {
+
     public static final String TAG = "ForgotPasswordFragment";
 
     private FirebaseAuth firebaseAuth;
@@ -32,6 +34,8 @@ public class ForgotPasswordFragment extends Fragment {
     EditText edEmail;
 
     Button btnSendEmail;
+
+    TextView tvBack;
 
 
     @Nullable
@@ -48,6 +52,14 @@ public class ForgotPasswordFragment extends Fragment {
 
     private void initView(View rootView) {
         edEmail = (EditText) rootView.findViewById(R.id.edEmail);
+
+        tvBack = (TextView) rootView.findViewById(R.id.tvBack);
+        tvBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         btnSendEmail = (Button) rootView.findViewById(R.id.btnSendEmail);
         setButtonSendEmailClickListener();

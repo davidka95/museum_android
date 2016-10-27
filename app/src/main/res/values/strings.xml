@@ -32,4 +32,6 @@
     <string name="forgot_password_miss_data_error_title" >Error!</string>
     <string name="forgot_password_succesfull_sent_email_message">An email has been sent to %1$s. Please check it!</string>
     <string name="forgot_password_succesfull_sent_email_title">Check your email!</string>
+    <string name="back_text"><![CDATA[< Back]]></string>
+    <string name="title_registration">Registration</string>
 </resources>

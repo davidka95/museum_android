@@ -27,6 +27,7 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
  */
 
 public class SignInFragment extends Fragment{
+
     private EditText edEmail;
     private EditText edPassword;
 

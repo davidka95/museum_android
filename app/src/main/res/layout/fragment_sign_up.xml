@@ -3,7 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_weight="1"
+    android:orientation="vertical"
+    tools:background="@drawable/login_background"
+    tools:theme="@style/AppTheme.FullScreen">
+
+    <TextView android:text="@string/title_registration"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/half_white"
+        style="@style/TextAppearance.Appcompat.Large.White"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -47,9 +59,19 @@
 
 
     <Button
+        android:layout_marginTop="10dp"
         android:id="@+id/btnSIgnUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sign_up_button_label" />
+
+    <TextView
+        android:padding="5dp"
+        android:id="@+id/tvBack"
+        android:layout_marginTop="30dp"
+        android:text="@string/back_text"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -15,8 +15,38 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.FullScreen" parent="AppTheme.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="buttonStyle">@style/LoginActivityButton</item>
+        <item name="android:textColor">@color/half_white</item>
+
+        <!--TextInputLayout style-->
+        <item name="android:textColorHint">@color/half_white</item>
+        <item name="colorControlNormal">@color/half_white</item>
+        <item name="editTextColor">@color/half_white</item>
+        <item name="colorControlActivated">#4b000000</item>
+
+
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <style name="TextAppearance.Appcompat.Large.White" parent="Base.TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/half_white</item>
+    </style>
+
+    <style name="TextAppearance.AppCompat.Medium.White" parent="Base.TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/half_white</item>
+    </style>
+
+    <style name="LoginActivityButton" parent="@style/Widget.AppCompat.Button">
+        <item name="android:textColor">@color/half_white</item>
+        <item name="android:background">#4b000000</item>
+    </style>
+
+
 
 </resources>

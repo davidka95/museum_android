@@ -21,36 +21,15 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSuccesfullLoginListener;
 
 public class LoginActivity extends AppCompatActivity implements SignInFragment.OnUserSettingsButtonClickListener, OnSuccesfullLoginListener{
     FragmentManager fragmentManager;
-    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initStatusBarColor();
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-
         fragmentManager = getSupportFragmentManager();
         Fragment signInFragment = new SignInFragment();
         fragmentManager.beginTransaction().replace(R.id.activity_login, signInFragment).commit();
-    }
-
-    private void initStatusBarColor() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
-        }
     }
 
     @Override
