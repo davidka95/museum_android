@@ -1,5 +1,6 @@
 package hu.bme.aut.exhibitionexplorer.fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -107,10 +108,16 @@ public class SignInFragment extends Fragment{
                 if(email.isEmpty() || password.isEmpty()){
                     showMissDataAlertDialog();
                 } else {
+                    final ProgressDialog progressDialog = new ProgressDialog(getContext(),
+                            R.style.AppTheme_FullScreen_ProgressDialog);
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("Authenticating...");
+                    progressDialog.show();
                     firebaseAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
+                                    progressDialog.dismiss();
                                     if (task.isSuccessful()) {
                                         onSuccesfullLoginListener.onSuccesfullLogin();
                                     } else {

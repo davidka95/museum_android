@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/Exhibition_card_view"
     android:layout_width="fill_parent"
-    android:layout_height="180.0dip"
+    android:layout_height="100.0dip"
     android:layout_margin="4.0dip"
     android:orientation="horizontal"
     app:cardBackgroundColor="@color/cardview_light_background"
@@ -20,13 +20,13 @@
             android:id="@+id/ExhibitionIconImageView"
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
-            android:layout_weight="2.0"
+            android:layout_weight="1.5"
             android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
-            android:layout_weight="3.0"
+            android:layout_weight="3.5"
             android:orientation="vertical">
 
             <TextView

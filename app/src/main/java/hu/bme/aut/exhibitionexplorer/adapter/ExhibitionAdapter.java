@@ -1,34 +1,40 @@
 package hu.bme.aut.exhibitionexplorer.adapter;
 
+import android.content.Context;
 import android.support.annotation.DrawableRes;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import hu.bme.aut.exhibitionexplorer.R;
+import hu.bme.aut.exhibitionexplorer.data.Exhibition;
+import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
 
 /**
  * Created by Zay on 2016.10.23..
  */
 
 public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.ExhibitionViewHolder> {
-    List<String[]> ExhibitionDemos;
+    private ArrayList<Exhibition> exhibitions;
+    private Context context;
 
-    public ExhibitionAdapter() {
-        ExhibitionDemos = new ArrayList();
-        initDemo();
-    }
+    ExhibitionFragment.OnItemClickListener onItemClickListener;
 
-    private void initDemo() {
-        this.ExhibitionDemos.add(new String[]{"Textúra kiállítás  a Nemzeti Galériában", "Megnyitó: 2016.10.18"});
-        this.ExhibitionDemos.add(new String[]{"World Press Photo", "Now in Budapest"});
-        this.ExhibitionDemos.add(new String[]{"Vadnyugat", "Az avantgárd Wrocław története"});
+    public ExhibitionAdapter(Context context, ExhibitionFragment.OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+        this.context = context;
+        exhibitions = new ArrayList<>();
     }
 
     public ExhibitionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,9 +42,17 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
     }
 
     public void onBindViewHolder(ExhibitionViewHolder holder, int position) {
-        holder.iconImageView.setImageResource(getDemoIcons(position));
-        holder.nameTextView.setText(((String[]) this.ExhibitionDemos.get(position))[0]);
-        holder.descriptionTextView.setText(((String[]) this.ExhibitionDemos.get(position))[1]);
+        final Exhibition exhibition = exhibitions.get(position);
+        Picasso.with(context).load(exhibition.getImageURL()).fit().centerCrop()
+                .placeholder(R.mipmap.ic_launcher).into(holder.iconImageView);
+        holder.nameTextView.setText(exhibition.getName());
+        holder.descriptionTextView.setText(exhibition.getDescription());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(exhibition);
+            }
+        });
     }
 
     private int getDemoIcons(int position) {
@@ -62,7 +76,11 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
 
 
     public int getItemCount() {
-        return this.ExhibitionDemos.size();
+        return exhibitions.size();
+    }
+
+    public void addExhibition(Exhibition exhibition) {
+        exhibitions.add(exhibition);
     }
 
 
