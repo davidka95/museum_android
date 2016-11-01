@@ -39,7 +39,6 @@ public class ExhibitionFragment extends Fragment
     public static final String TAG = "ExhibitionFragment";
     protected ExhibitionAdapter adapter;
     protected RecyclerView recyclerView;
-    FirebaseAuth firebaseAuth;
     FirebaseDatabase database;
     DatabaseReference databaseReference;
 

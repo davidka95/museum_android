@@ -7,7 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import hu.bme.aut.exhibitionexplorer.R;
+import hu.bme.aut.exhibitionexplorer.data.Artifact;
 
 /**
  * Created by Adam on 2016. 10. 29..
@@ -16,6 +23,8 @@ import hu.bme.aut.exhibitionexplorer.R;
 public class CatalogFragment extends Fragment{
 
     public static final String TAG = "CatalogFragment";
+    FirebaseDatabase database;
+    DatabaseReference databaseReference;
 
     @Nullable
     @Override

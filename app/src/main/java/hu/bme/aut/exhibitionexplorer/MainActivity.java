@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                initNavigationDrawer();
             }
         });
         } else {
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
             mFirebaseAuth.signOut();
             recreate();
         }
-        getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
+        //getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
