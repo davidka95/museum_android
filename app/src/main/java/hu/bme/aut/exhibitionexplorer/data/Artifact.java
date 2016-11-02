@@ -16,7 +16,7 @@ public class Artifact implements Parcelable {
     private String UuID;
 
     @PropertyName("beaconID")
-    private long beaconID;
+    private String beaconID;
 
     @PropertyName("description")
     private String description;
@@ -49,11 +49,11 @@ public class Artifact implements Parcelable {
         UuID = uuID;
     }
 
-    public long getBeaconID() {
+    public String getBeaconID() {
         return beaconID;
     }
 
-    public void setBeaconID(long beaconID) {
+    public void setBeaconID(String beaconID) {
         this.beaconID = beaconID;
     }
 
@@ -107,7 +107,7 @@ public class Artifact implements Parcelable {
 
     protected Artifact(Parcel in) {
         UuID = in.readString();
-        beaconID = in.readLong();
+        beaconID = in.readString();
         description = in.readString();
         imageURL = in.readString();
         inExhibition = in.readLong();
@@ -124,7 +124,7 @@ public class Artifact implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(UuID);
-        dest.writeLong(beaconID);
+        dest.writeString(beaconID);
         dest.writeString(description);
         dest.writeString(imageURL);
         dest.writeLong(inExhibition);
