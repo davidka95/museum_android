@@ -1,6 +1,5 @@
 package hu.bme.aut.exhibitionexplorer.fragment;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,19 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.ExhibitionAdapter;
@@ -55,7 +47,7 @@ public class ExhibitionFragment extends Fragment
         if(activity instanceof OnItemClickListener){
             onItemClickListener = (OnItemClickListener) activity;
         } else {
-            throw new RuntimeException("Activity must implement ExhibitionFragment.OnItemClickListener interface");
+            throw new RuntimeException("Activity must implement ExhibitionFragment.OnArtifactItemClickListener interface");
         }
     }
 
@@ -78,7 +70,7 @@ public class ExhibitionFragment extends Fragment
         });
 
         Log.d("ExhibitionFragment", "ExhibitionFragment started");
-        this.recyclerView = ((RecyclerView)localView.findViewById(R.id.ExchibitionsRecyclerView));
+        this.recyclerView = ((RecyclerView)localView.findViewById(R.id.ExhibitionsRecyclerView));
         this.adapter = new ExhibitionAdapter(getContext(), onItemClickListener);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.recyclerView.setAdapter(adapter);

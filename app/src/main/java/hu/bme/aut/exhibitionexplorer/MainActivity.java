@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.zip.Inflater;
 
+import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
@@ -35,7 +37,8 @@ import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
+        CatalogFragment.OnArtifactItemClickListener {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
@@ -122,7 +125,11 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_catalog) {
             checkedNavMenuID = R.id.nav_catalog;
             if (exhibition!=null) {
-                showFragment(new CatalogFragment(), CatalogFragment.TAG);
+                Bundle bundle = new Bundle();
+                bundle.putString(CatalogFragment.ExhibitionTag, exhibitionUuID);
+                CatalogFragment catalogFragment = new CatalogFragment();
+                catalogFragment.setArguments(bundle);
+                showFragment(catalogFragment, CatalogFragment.TAG);
             } else {
                 showFragment(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
@@ -208,5 +215,10 @@ public class MainActivity extends AppCompatActivity
                 onNavigationItemSelected(navigationView.getMenu().findItem(checkedNavMenuID));
             }
         }
+    }
+
+    @Override
+    public void onArtifactItemClick(Artifact artifact) {
+        Toast.makeText(this, "Még nincs implementálva", Toast.LENGTH_SHORT).show();
     }
 }
