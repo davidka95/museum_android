@@ -1,8 +1,6 @@
 package hu.bme.aut.exhibitionexplorer;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -29,14 +27,22 @@ public class ExhibitionActivity extends AppCompatActivity implements ExhibitionF
                 onBackPressed();
             }
         });
-        showFragment(new ExhibitionFragment(), ExhibitionFragment.TAG);
+        if(savedInstanceState ==  null)
+            showFragmentWithNoBackStack(new ExhibitionFragment(), ExhibitionFragment.TAG);
 
     }
 
-    private void showFragment(Fragment fragment, String tag) {
+    private void showFragmentWithNoBackStack(ExhibitionFragment fragment, String tag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment, tag)
                 .commit();
+    }
+
+    private void showFragmentWithBackStack(Fragment fragment, String tag) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment, tag);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -45,7 +51,7 @@ public class ExhibitionActivity extends AppCompatActivity implements ExhibitionF
         Bundle exhibitionBundle = new Bundle();
         exhibitionBundle.putParcelable(Exhibition.KEY_EXHIBITION_PARCELABLE, exhibition);
         exhibitionDetailFragment.setArguments(exhibitionBundle);
-        showFragment(exhibitionDetailFragment, ExhibitionDetailFragment.TAG);
+        showFragmentWithBackStack(exhibitionDetailFragment, ExhibitionDetailFragment.TAG);
     }
 
     @Override
