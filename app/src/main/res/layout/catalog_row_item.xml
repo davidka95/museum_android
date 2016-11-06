@@ -17,14 +17,14 @@
         android:weightSum="5.0">
 
         <ImageView
-            android:id="@+id/ArtifactIconImageView"
+            android:id="@+id/CatalogIconImageView"
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
             android:layout_weight="1.5"
             android:scaleType="centerCrop" />
 
         <TextView
-            android:id="@+id/ArtifactNameTextView"
+            android:id="@+id/CatalogNameTextView"
             android:layout_width="0.0dp"
             android:layout_height="match_parent"
             android:layout_weight="3.5"

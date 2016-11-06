@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -12,11 +13,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,12 +25,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.zip.Inflater;
-
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
+import hu.bme.aut.exhibitionexplorer.fragment.ArtifactDetailFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
-import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
@@ -52,22 +49,22 @@ public class MainActivity extends AppCompatActivity
 
     Toolbar toolbar;
 
-    private void getExhibition(){
-        if(exhibitionUuID!=null){
+    private void getExhibition() {
+        if (exhibitionUuID != null) {
 
-        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("exhibitions").child(exhibitionUuID);
-        dbReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                exhibition = dataSnapshot.getValue(Exhibition.class);
-                initCheckedItem();
-            }
+            DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("exhibitions").child(exhibitionUuID);
+            dbReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    exhibition = dataSnapshot.getValue(Exhibition.class);
+                    initCheckedItem();
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                initCheckedItem();
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    initCheckedItem();
+                }
+            });
         } else {
             initCheckedItem();
         }
@@ -96,10 +93,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-
-
-
-
     }
 
     private void loadLoginActivity() {
@@ -126,21 +119,18 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_explore) {
             checkedNavMenuID = R.id.nav_explore;
-            if (exhibition!=null) {
-                showFragment(new ExplorerFragment(), ExplorerFragment.TAG);
+            if (exhibition != null) {
+                showFragmentWithNoBackStack(new ExplorerFragment(), ExplorerFragment.TAG);
             } else {
-                showFragment(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
+                showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_catalog) {
             checkedNavMenuID = R.id.nav_catalog;
-            if (exhibition!=null) {
-                Bundle bundle = new Bundle();
-                bundle.putString(CatalogFragment.ExhibitionTag, exhibitionUuID);
-                CatalogFragment catalogFragment = new CatalogFragment();
-                catalogFragment.setArguments(bundle);
-                showFragment(catalogFragment, CatalogFragment.TAG);
+            if (exhibition != null) {
+                CatalogFragment catalogFragment = getCatalogFragment();
+                showFragmentWithNoBackStack(catalogFragment, CatalogFragment.TAG);
             } else {
-                showFragment(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
+                showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_favorite) {
             checkedNavMenuID = R.id.nav_favorite;
@@ -162,13 +152,26 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void showFragment(Fragment fragment, String tag) {
+    @NonNull
+    private CatalogFragment getCatalogFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString(CatalogFragment.ExhibitionTag, exhibitionUuID);
+        CatalogFragment catalogFragment = new CatalogFragment();
+        catalogFragment.setArguments(bundle);
+        return catalogFragment;
+    }
+
+    private void showFragmentWithNoBackStack(Fragment fragment, String tag) {
         FragmentTransaction localFragmentTransaction = getSupportFragmentManager().beginTransaction();
+        localFragmentTransaction.replace(R.id.content_main, fragment, tag)
+                .commit();
+    }
 
-        localFragmentTransaction.replace(R.id.content_main, fragment, tag);
-        localFragmentTransaction.addToBackStack(null);
-
-        localFragmentTransaction.commit();
+    private void showFragmentWithBackStack(Fragment fragment, String tag) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_main, fragment, tag);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -182,7 +185,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         long id = item.getItemId();
-        if(id == R.id.menu_item_exhibition){
+        if (id == R.id.menu_item_exhibition) {
             startExhibitionActivity();
         }
         return super.onOptionsItemSelected(item);
@@ -215,8 +218,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            if(requestCode == REQUEST_EXHIBITION){
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_EXHIBITION) {
                 exhibition = data.getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
                 SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
@@ -229,10 +232,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onArtifactItemClick(Artifact artifact) {
-        Toast.makeText(this, "Még nincs implementálva", Toast.LENGTH_SHORT).show();
+        ArtifactDetailFragment artifactDetailFragment = new ArtifactDetailFragment();
+        Bundle  artifactBundle = new Bundle();
+        artifactBundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+        artifactDetailFragment.setArguments(artifactBundle);
+        showFragmentWithBackStack(artifactDetailFragment, artifactDetailFragment.TAG);
     }
 
-    private void initCheckedItem(){
+    private void initCheckedItem() {
         checkedNavMenuID = R.id.nav_explore;
         navigationView.setCheckedItem(R.id.nav_explore);
         onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_explore));

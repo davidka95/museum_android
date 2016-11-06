@@ -67,8 +67,8 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
 
         public CatalogViewHolder(View itemView) {
             super(itemView);
-            this.iconImageView = ((ImageView) itemView.findViewById(R.id.ArtifactIconImageView));
-            this.nameTextView = ((TextView) itemView.findViewById(R.id.ArtifactNameTextView));
+            this.iconImageView = ((ImageView) itemView.findViewById(R.id.CatalogIconImageView));
+            this.nameTextView = ((TextView) itemView.findViewById(R.id.CatalogNameTextView));
         }
     }
 }
