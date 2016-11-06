@@ -1,4 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -13,6 +15,14 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+    
+    <style name="CardView.Exhibition" parent="CardView">
+        <item name="cardUseCompatPadding">true</item>
+        <item name="contentPaddingBottom">@dimen/card_view_top_and_bottom_padding</item>
+        <item name="contentPaddingTop">@dimen/card_view_top_and_bottom_padding</item>
+        <item name="contentPaddingLeft">@dimen/activity_horizontal_margin</item>
+        <item name="contentPaddingRight">@dimen/activity_horizontal_margin</item>
     </style>
 
     <style name="AppTheme.FullScreen" parent="AppTheme.NoActionBar">

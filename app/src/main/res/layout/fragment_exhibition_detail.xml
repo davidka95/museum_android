@@ -33,30 +33,111 @@
                         android:src="@drawable/exhibition_demo_icon_textura" />
 
                     <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Large"
+                        android:id="@+id/tvExhibitionTitle"
+                        style="@style/Base.TextAppearance.AppCompat.Medium"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
                         android:layout_marginTop="20dp"
                         android:gravity="center_horizontal"
-                        android:text="Múzeum Múmia"
-                        app:layout_anchor="@id/ivExhibitionImage" />
+                        tools:text="Múzeum Múmia" />
 
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:text="@string/exhibition_details_title" />
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardUseCompatPadding="true">
+                style="@style/CardView.Exhibition">
 
-                <TextView
-                    style="@style/Base.TextAppearance.AppCompat.Medium"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="?android:listDivider"
+                    android:orientation="vertical"
+                    android:showDividers="middle">
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="Date 2014.05.03-2015" />
+
+                    <TextView android:id="@+id/tvLocation"
+                        style="@style/Base.TextAppearance.AppCompat.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="1146 Budapest, Dózsa György út 41." />
+
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <TextView android:text="@string/exploration_details_title"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CardView.Exhibition">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="?android:listDivider"
+                    android:orientation="vertical"
+                    android:showDividers="middle">
+
+                    <TextView
+                        android:id="@+id/tvIBeacons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="iBeacons: true" />
+
+                    <TextView android:id="@+id/tvQrCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="QR-codes: true" />
+
+                    <TextView android:id="@+id/tvQuiz"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="Quiz: true"/>
+
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <TextView android:text="@string/description_title"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CardView.Exhibition">
+
+                <TextView android:id="@+id/tvDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/activity_horizontal_margin"
-                    android:text="@string/lorem_ipsum" />
+                    tools:text="@string/lorem_ipsum" />
             </android.support.v7.widget.CardView>
 
 
@@ -67,10 +148,10 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabSelect"
-        android:src="@drawable/ic_check"
-        app:fabSize="normal"
-        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"/>
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:src="@drawable/ic_check"
+        app:fabSize="normal" />
 </android.support.design.widget.CoordinatorLayout>

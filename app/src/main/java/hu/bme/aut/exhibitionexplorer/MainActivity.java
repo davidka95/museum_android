@@ -60,18 +60,19 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 exhibition = dataSnapshot.getValue(Exhibition.class);
-                initNavigationDrawer();
+                initCheckedItem();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                initNavigationDrawer();
+                initCheckedItem();
             }
         });
         } else {
-            initNavigationDrawer();
+            initCheckedItem();
         }
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,11 @@ public class MainActivity extends AppCompatActivity
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        initNavigationDrawer();
+
+
         SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
         exhibitionUuID = sp.getString(KEY_CHOOSED_EXHIBITION, null);
         getExhibition();
@@ -89,8 +95,11 @@ public class MainActivity extends AppCompatActivity
             loadLoginActivity();
         }
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+
+
+
+
     }
 
     private void loadLoginActivity() {
@@ -140,8 +149,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_help_and_feedbeck) {
 
         } else if (id == R.id.nav_sign_out) {
+            SharedPreferences sp = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(KEY_CHOOSED_EXHIBITION, null);
+            editor.commit();
             mFirebaseAuth.signOut();
-            recreate();
+            loadLoginActivity();
         }
         //getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,9 +200,6 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.inflateHeaderView(R.layout.nav_header_main);
         navigationView.setNavigationItemSelectedListener(this);
-        checkedNavMenuID = R.id.nav_explore;
-        navigationView.setCheckedItem(R.id.nav_explore);
-        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_explore));
     }
 
     @Override
@@ -220,5 +230,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onArtifactItemClick(Artifact artifact) {
         Toast.makeText(this, "Még nincs implementálva", Toast.LENGTH_SHORT).show();
+    }
+
+    private void initCheckedItem(){
+        checkedNavMenuID = R.id.nav_explore;
+        navigationView.setCheckedItem(R.id.nav_explore);
+        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_explore));
     }
 }
