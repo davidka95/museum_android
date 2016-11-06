@@ -118,14 +118,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_explore) {
-            checkedNavMenuID = R.id.nav_explore;
+            setNavigationViewTitle(R.id.nav_explore);
             if (exhibition != null) {
                 showFragmentWithNoBackStack(new ExplorerFragment(), ExplorerFragment.TAG);
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_catalog) {
-            checkedNavMenuID = R.id.nav_catalog;
+            setNavigationViewTitle(R.id.nav_catalog);
             if (exhibition != null) {
                 CatalogFragment catalogFragment = getCatalogFragment();
                 showFragmentWithNoBackStack(catalogFragment, CatalogFragment.TAG);
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_favorite) {
-            checkedNavMenuID = R.id.nav_favorite;
+            setNavigationViewTitle(R.id.nav_favorite);
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_help_and_feedbeck) {
@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity
             mFirebaseAuth.signOut();
             loadLoginActivity();
         }
-        //getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -232,16 +231,19 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onArtifactItemClick(Artifact artifact) {
-        ArtifactDetailFragment artifactDetailFragment = new ArtifactDetailFragment();
-        Bundle  artifactBundle = new Bundle();
-        artifactBundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-        artifactDetailFragment.setArguments(artifactBundle);
-        showFragmentWithBackStack(artifactDetailFragment, artifactDetailFragment.TAG);
+        Intent startArtifactActivity = new Intent(this, ArtifactActivity.class);
+        startArtifactActivity.putExtra(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+        startActivity(startArtifactActivity);
     }
 
     private void initCheckedItem() {
-        checkedNavMenuID = R.id.nav_explore;
         navigationView.setCheckedItem(R.id.nav_explore);
         onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_explore));
+        setNavigationViewTitle(R.id.nav_explore);
+    }
+
+    private void setNavigationViewTitle(int id){
+        checkedNavMenuID = id;
+        getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
     }
 }

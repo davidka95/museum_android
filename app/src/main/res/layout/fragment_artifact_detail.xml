@@ -67,67 +67,6 @@
                     tools:text="Pampam" />
             </android.support.v7.widget.CardView>
 
-            <TextView
-                android:id="@+id/tvQuizQuestion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:layout_marginTop="10dp"
-                android:gravity="center_horizontal"
-                android:text="Kvízkérdés" />
-
-            <android.support.v7.widget.CardView
-                style="@style/CardView.Exhibition"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/card_view_top_and_bottom_padding"
-                android:layout_marginRight="@dimen/card_view_top_and_bottom_padding">
-
-                <TextView
-                    android:id="@+id/tvAnswerA"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    tools:text="A" />
-
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                style="@style/CardView.Exhibition"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/card_view_top_and_bottom_padding"
-                android:layout_marginRight="@dimen/card_view_top_and_bottom_padding">
-
-                <TextView
-                    android:id="@+id/tvAnswerB"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    tools:text="B" />
-
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                style="@style/CardView.Exhibition"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/card_view_top_and_bottom_padding"
-                android:layout_marginRight="@dimen/card_view_top_and_bottom_padding">
-
-                <TextView
-                    android:id="@+id/tvAnswerC"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    tools:text="C" />
-
-
-            </android.support.v7.widget.CardView>
-
-
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
@@ -139,7 +78,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/activity_vertical_margin"
         android:src="@drawable/ic_favorite"
-        app:backgroundTint="#FFFFFF"
         app:fabSize="normal" />
 
 </android.support.design.widget.CoordinatorLayout>

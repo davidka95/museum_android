@@ -22,7 +22,10 @@
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.FullScreen" />
-        <activity android:name=".ExhibitionActivity"
+        <activity
+            android:name=".ExhibitionActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ArtifactActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

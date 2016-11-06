@@ -7,7 +7,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="nav_txt_museum">Museum</string>
-    <string name="nav_txt_exhibition">Exhibition</string>
+    <string name="nav_txt_exhibition">Explorer</string>
     <string name="nav_txt_favorite">Favorite</string>
     <string name="nav_txt_settings">Settings</string>
     <string name="nav_txt_help_and_feedback"><![CDATA[Help & Feedback]]></string>
@@ -34,7 +34,7 @@
     <string name="forgot_password_succesfull_sent_email_title">Check your email!</string>
     <string name="back_text"><![CDATA[< Back]]></string>
     <string name="title_registration">Registration</string>
-    <string name="choose_exhibition_text">Choose one exhibition what you want to explore!</string>
+    <string name="choose_exhibition_text">Please choose one exhibition!</string>
     <string name="nav_txt_catalog">Catalog</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vestibulum nibh ac nibh fringilla tincidunt. Vestibulum efficitur in sapien et placerat. Ut turpis ante, accumsan posuere massa et, lacinia venenatis lorem. Nullam in consectetur orci. Morbi id tempus nunc, vitae cursus arcu. Aliquam imperdiet nisi a malesuada malesuada. Fusce volutpat pulvinar sem, in semper augue ornare nec. In hac habitasse platea dictumst. Nullam at accumsan elit. Proin tincidunt vitae massa et egestas. Fusce lacinia massa ut sem accumsan malesuada. In euismod varius augue, sit amet tincidunt neque bibendum vel. Nam mi lorem, feugiat consectetur enim id, posuere dictum enim. Nam sodales laoreet imperdiet. Pellentesque laoreet diam neque, sit amet elementum nibh feugiat finibus. Nulla facilisi. Vivamus aliquam massa in lectus dignissim aliquet. Morbi auctor facilisis neque, sed congue mi vestibulum sed. In enim dolor, tempus vitae ornare eu, consequat eget dui. Mauris nec erat in metus elementum mollis in sed risus. Duis in ullamcorper leo. Maecenas vel egestas urna. Duis tristique consequat diam sit amet convallis. Morbi pellentesque, ex at aliquam maximus, eros mauris porttitor libero, eu eleifend urna metus non tortor. Integer rhoncus magna imperdiet turpis ornare placerat. Praesent vel eleifend dui. Curabitur pulvinar mi sit amet finibus dapibus. Aenean volutpat malesuada urna, et dignissim purus fringilla vel. Suspendisse augue dui, commodo in orci non, maximus vehicula nulla. Fusce imperdiet vestibulum purus id malesuada. Fusce congue nisi et vestibulum sodales. Morbi eleifend ullamcorper porta. In sed metus lacus. Nunc diam neque, placerat ut est sit amet, mollis consequat dolor. Phasellus viverra, arcu eu aliquam euismod, orci leo maximus mi, vitae vestibulum leo est eget augue. Maecenas vitae malesuada arcu. Vestibulum eget elit id erat venenatis aliquam. Aenean fermentum facilisis ex vitae maximus. Donec ut odio sed dolor posuere tempus vehicula id quam. Curabitur sit amet orci non justo tempor sollicitudin eu eu eros. Vestibulum ut odio in nisl porta venenatis. Aenean ultrices a mi in placerat. Suspendisse viverra justo ac vulputate varius. Mauris semper facilisis tortor quis imperdiet. In vel lacinia ligula. Aenean semper commodo suscipit. Quisque a diam quis quam hendrerit rutrum.</string>
     <string name="parameter_open_duration_text">Date:    %1$s</string>
@@ -45,6 +45,7 @@
     <string name="parameter_ibeacons_text">iBeacons:   %1$s</string>
     <string name="parameter_qr_code_text">QR-codes:   %1$s</string>
     <string name="parameter_quiz_text">Quiz:   %1$s</string>
+    <string name="catalog_detail_toolbar_title">Catalog Detail</string>
     <string-array name="checked_nav_text">
         <item>@string/nav_txt_exhibition</item>
         <item>@string/nav_txt_catalog</item>
