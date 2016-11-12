@@ -31,7 +31,7 @@ public class Exhibition implements Parcelable {
     }
 
     @PropertyName("artifactHere")
-    private ArrayList<Boolean> artifactsHere;
+    private HashMap<String, Boolean> artifactsHere;
 
     @PropertyName("beacon")
     private boolean beacon;
@@ -43,7 +43,7 @@ public class Exhibition implements Parcelable {
     private String imageURL;
 
     @PropertyName("inMuseum")
-    private long inMuseum;
+    private String inMuseum;
 
     @PropertyName("name")
     private String name;
@@ -60,19 +60,19 @@ public class Exhibition implements Parcelable {
     public Exhibition() {
     }
 
-    public ArrayList<Boolean> getArtifactsHere() {
+    public HashMap<String, Boolean> getArtifactsHere() {
         return artifactsHere;
     }
 
-    public void setArtifactsHere(ArrayList<Boolean> artifactsHere) {
+    public void setArtifactsHere(HashMap<String, Boolean> artifactsHere) {
         this.artifactsHere = artifactsHere;
     }
 
-    public long getInMuseum() {
+    public String getInMuseum() {
         return inMuseum;
     }
 
-    public void setInMuseum(long inMuseum) {
+    public void setInMuseum(String inMuseum) {
         this.inMuseum = inMuseum;
     }
 
@@ -134,16 +134,11 @@ public class Exhibition implements Parcelable {
 
     protected Exhibition(Parcel in) {
         UuID = in.readString();
-        if (in.readByte() == 0x01) {
-            artifactsHere = new ArrayList<Boolean>();
-            in.readList(artifactsHere, Boolean.class.getClassLoader());
-        } else {
-            artifactsHere = null;
-        }
+        artifactsHere = (HashMap) in.readValue(HashMap.class.getClassLoader());
         beacon = in.readByte() != 0x00;
         description = in.readString();
         imageURL = in.readString();
-        inMuseum = in.readLong();
+        inMuseum = in.readString();
         name = in.readString();
         openDuration = in.readString();
         qr = in.readByte() != 0x00;
@@ -158,16 +153,11 @@ public class Exhibition implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(UuID);
-        if (artifactsHere == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(artifactsHere);
-        }
+        dest.writeValue(artifactsHere);
         dest.writeByte((byte) (beacon ? 0x01 : 0x00));
         dest.writeString(description);
         dest.writeString(imageURL);
-        dest.writeLong(inMuseum);
+        dest.writeString(inMuseum);
         dest.writeString(name);
         dest.writeString(openDuration);
         dest.writeByte((byte) (qr ? 0x01 : 0x00));

@@ -3,7 +3,9 @@ package hu.bme.aut.exhibitionexplorer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +28,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.MonitorNotifier;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
+import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 import hu.bme.aut.exhibitionexplorer.fragment.ArtifactDetailFragment;
@@ -35,19 +51,28 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        CatalogFragment.OnArtifactItemClickListener {
+        CatalogFragment.OnArtifactItemClickListener, BeaconConsumer {
 
     public static final int REQUEST_EXHIBITION = 102;
+    public static final String BEACON_TAG = "BEACON_TAG";
     public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
 
     private String exhibitionUuID;
     private Exhibition exhibition = null;
+    private HashMap<String, Boolean> artifactsHere;
+    private ArrayList<Artifact> artifacts = new ArrayList<>();
+
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
-    NavigationView navigationView;
+    private NavigationView navigationView;
     private int checkedNavMenuID;
 
-    Toolbar toolbar;
+    private String nearestIBeacon = null;
+
+    private BeaconManager beaconManager;
+
+    private Toolbar toolbar;
 
     private void getExhibition() {
         if (exhibitionUuID != null) {
@@ -57,7 +82,8 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     exhibition = dataSnapshot.getValue(Exhibition.class);
-                    initCheckedItem();
+                    artifactsHere = exhibition.getArtifactsHere();
+                    getArtifact();
                 }
 
                 @Override
@@ -68,6 +94,20 @@ public class MainActivity extends AppCompatActivity
         } else {
             initCheckedItem();
         }
+    }
+
+    private void getArtifact() {
+        FirebaseDatabase.getInstance().getReference().child("artifacts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                asyncTask.execute(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -92,7 +132,18 @@ public class MainActivity extends AppCompatActivity
             loadLoginActivity();
         }
 
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.bind(this);
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        beaconManager.unbind(this);
     }
 
     private void loadLoginActivity() {
@@ -119,15 +170,19 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_explore) {
             setNavigationViewTitle(R.id.nav_explore);
+            nearestIBeacon = null;
             if (exhibition != null) {
-                showFragmentWithNoBackStack(new ExplorerFragment(), ExplorerFragment.TAG);
+                //showFragmentWithNoBackStack(new ExplorerFragment(), ExplorerFragment.TAG);
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_catalog) {
             setNavigationViewTitle(R.id.nav_catalog);
             if (exhibition != null) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Exhibition.KEY_EXHIBITION_PARCELABLE, exhibition);
                 CatalogFragment catalogFragment = getCatalogFragment();
+                catalogFragment.setArguments(bundle);
                 showFragmentWithNoBackStack(catalogFragment, CatalogFragment.TAG);
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
@@ -166,11 +221,10 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
-    private void showFragmentWithBackStack(Fragment fragment, String tag) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_main, fragment, tag);
-        transaction.addToBackStack(null);
-        transaction.commit();
+    private void showFragmentWithAnimation(Fragment fragment, String tag){
+        FragmentTransaction localFragmentTransaction = getSupportFragmentManager().beginTransaction();
+        localFragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.content_main, fragment, tag).commit();
     }
 
     @Override
@@ -246,4 +300,93 @@ public class MainActivity extends AppCompatActivity
         checkedNavMenuID = id;
         getSupportActionBar().setTitle(navigationView.getMenu().findItem(checkedNavMenuID).getTitle());
     }
+
+    @Override
+    public void onBeaconServiceConnect() {
+
+        beaconManager.setRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0 && exhibition!=null && checkedNavMenuID == R.id.nav_explore) {
+                    manageBeacon(beacons.iterator().next());
+                }
+            }
+        });
+
+        beaconManager.setMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+                Log.i(BEACON_TAG, "I just saw an iBeacon for the firt time!");
+            }
+
+            @Override
+            public void didExitRegion(Region region) {
+                Log.i(BEACON_TAG, "I no longer see an iBeacon");
+            }
+
+            @Override
+            public void didDetermineStateForRegion(int state, Region region) {
+                Log.i(BEACON_TAG, "I have just switched from seeing/not seeing iBeacons: "+state);
+            }
+
+
+        });
+
+        try {
+            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
+        } catch (RemoteException e) {   }
+
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+        } catch (RemoteException e) {    }
+    }
+
+    private void manageBeacon(Beacon beacon) {
+        if(nearestIBeacon ==null ||!nearestIBeacon.equals(beacon.getId3().toString())){
+            nearestIBeacon = beacon.getId3().toString();
+            Bundle bundle = new Bundle();
+            if (beacon.getId3().toString().equals("18")){
+                for (int i = 0; i< artifacts.size(); i++){
+                    if(artifacts.get(i).getUuID().equals("-KWOC2aS0ILuIQ60JsZY")) {
+                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifacts.get(i));
+                        break;
+                    }
+                }
+
+            } else {
+                for (int i = 0; i< artifacts.size(); i++){
+                    if(artifacts.get(i).getUuID().equals("-KWOCRVQoBoV-XDp8J58")) {
+                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifacts.get(i));
+                        break;
+                    }
+                }
+            }
+            Fragment explorerFragment = new ExplorerFragment();
+            explorerFragment.setArguments(bundle);
+            showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
+        }
+
+        Log.d(BEACON_TAG, "manageBeacon: " + beacon.getId3() + " ID");
+
+    }
+
+    final AsyncTask<DataSnapshot, Void, Void> asyncTask = new AsyncTask<DataSnapshot, Void, Void>() {
+        @Override
+        protected Void doInBackground(DataSnapshot... params) {
+            for (DataSnapshot datasnapshot: params[0].getChildren()){
+                if(artifactsHere.containsKey(datasnapshot.getKey())){
+                    Artifact artifact = datasnapshot.getValue(Artifact.class);
+                    artifact.setUuID(datasnapshot.getKey());
+                    artifacts.add(artifact);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            initCheckedItem();
+        }
+    };
 }

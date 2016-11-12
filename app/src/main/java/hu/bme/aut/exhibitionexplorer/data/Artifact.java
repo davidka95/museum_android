@@ -27,7 +27,7 @@ public class Artifact implements Parcelable {
     private String imageURL;
 
     @PropertyName("inExhibition")
-    private long inExhibition;
+    private String inExhibition;
 
     @PropertyName("name")
     private String name;
@@ -75,11 +75,11 @@ public class Artifact implements Parcelable {
         this.imageURL = imageURL;
     }
 
-    public long getInExhibition() {
+    public String getInExhibition() {
         return inExhibition;
     }
 
-    public void setInExhibition(long inExhibition) {
+    public void setInExhibition(String inExhibition) {
         this.inExhibition = inExhibition;
     }
 
@@ -112,7 +112,7 @@ public class Artifact implements Parcelable {
         beaconID = in.readString();
         description = in.readString();
         imageURL = in.readString();
-        inExhibition = in.readLong();
+        inExhibition = in.readString();
         name = in.readString();
         qrURL = in.readString();
         quiz = in.readString();
@@ -129,7 +129,7 @@ public class Artifact implements Parcelable {
         dest.writeString(beaconID);
         dest.writeString(description);
         dest.writeString(imageURL);
-        dest.writeLong(inExhibition);
+        dest.writeString(inExhibition);
         dest.writeString(name);
         dest.writeString(qrURL);
         dest.writeString(quiz);

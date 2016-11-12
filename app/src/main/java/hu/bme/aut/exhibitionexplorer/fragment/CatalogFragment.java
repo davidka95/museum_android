@@ -1,6 +1,8 @@
 package hu.bme.aut.exhibitionexplorer.fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
@@ -34,7 +38,8 @@ public class CatalogFragment extends Fragment {
     public static final String ExhibitionTag = "ExhibitionID";
     FirebaseDatabase database;
     DatabaseReference mArtifactsReference;
-    private String ExhibitionID;
+    private Exhibition exhibition;
+    private HashMap<String, Boolean> artifactsHere;
 
     OnArtifactItemClickListener onItemClickListener;
 
@@ -58,17 +63,15 @@ public class CatalogFragment extends Fragment {
 
         database = FirebaseDatabase.getInstance();
         mArtifactsReference = database.getReference("artifacts");
-        ExhibitionID = getArguments().getString(ExhibitionTag);
+        exhibition = getArguments().getParcelable(Exhibition.KEY_EXHIBITION_PARCELABLE);
+         artifactsHere = exhibition.getArtifactsHere();
+
+
 
         mArtifactsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot datasnapshot: dataSnapshot.getChildren()){
-                    Artifact artifact = datasnapshot.getValue(Artifact.class);
-                    artifact.setUuID(datasnapshot.getKey());
-                    if(artifact.getInExhibition() == 1)
-                    adapter.addArtifact(artifact);
-                }
+                asyncTask.execute(dataSnapshot);
             }
 
             @Override
@@ -89,4 +92,24 @@ public class CatalogFragment extends Fragment {
     public interface OnArtifactItemClickListener {
         public void onArtifactItemClick(Artifact artifact);
     }
+
+    final AsyncTask<DataSnapshot, Void, CatalogAdapter> asyncTask = new AsyncTask<DataSnapshot, Void, CatalogAdapter>() {
+        @Override
+        protected CatalogAdapter doInBackground(DataSnapshot... params) {
+            for (DataSnapshot datasnapshot: params[0].getChildren()){
+                if(artifactsHere.containsKey(datasnapshot.getKey())){
+                    Artifact artifact = datasnapshot.getValue(Artifact.class);
+                    artifact.setUuID(datasnapshot.getKey());
+                    adapter.addArtifact(artifact);
+                }
+            }
+
+            return adapter;
+        }
+
+        @Override
+        protected void onPostExecute(CatalogAdapter catalogAdapter) {
+            catalogAdapter.notifyDataSetChanged();
+        }
+    };
 }

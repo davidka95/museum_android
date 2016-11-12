@@ -25,13 +25,10 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-
-                    <ImageView
-                        android:id="@+id/ivArtifactImage"
+                    <com.flaviofaria.kenburnsview.KenBurnsView
+                        android:id="@+id/kvArtifactImage"
                         android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/exhibition_demo_icon_vadnyugat" />
+                        android:layout_height="250dp" />
 
                     <TextView
                         android:id="@+id/tvArtifactName"

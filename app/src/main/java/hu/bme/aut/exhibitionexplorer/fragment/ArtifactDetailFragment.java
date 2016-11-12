@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.squareup.picasso.Picasso;
 
 import hu.bme.aut.exhibitionexplorer.R;
@@ -27,7 +28,7 @@ public class ArtifactDetailFragment extends Fragment {
     public static final String TAG = "ArtifactDetailFragment";
     private Artifact artifact;
 
-    private ImageView ivArtifactImage;
+    private KenBurnsView ivArtifactImage;
     private TextView tvArtifactName;
     private TextView tvArtifactDescription;
     private FloatingActionButton fabFavorite;
@@ -52,7 +53,7 @@ public class ArtifactDetailFragment extends Fragment {
             }
         });
         
-        ivArtifactImage = (ImageView) rootView.findViewById(R.id.ivArtifactImage);
+        ivArtifactImage = (KenBurnsView) rootView.findViewById(R.id.kvArtifactImage);
         tvArtifactName = (TextView) rootView.findViewById(R.id.tvArtifactName);
         tvArtifactDescription = (TextView) rootView.findViewById(R.id.tvArtifactDescription);
 

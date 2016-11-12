@@ -51,4 +51,8 @@
         <item>@string/nav_txt_catalog</item>
         <item>@string/nav_txt_favorite</item>
     </string-array>
+    <string name="title_bluetooth_le_not_available">Bluetooth LE not available</string>
+    <string name="sorry_bluetooth_not_supported">Bluetooth LE not supported</string>
+    <string name="title_bluetooth_not_enabled">Bluetooth not enabled</string>
+    <string name="enable_bluetooth">Enable</string>
 </resources>

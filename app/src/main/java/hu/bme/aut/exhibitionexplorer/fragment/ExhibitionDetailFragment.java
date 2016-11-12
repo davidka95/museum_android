@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,7 +38,7 @@ public class ExhibitionDetailFragment extends Fragment {
 
     private FloatingActionButton fabSelect;
 
-    private ImageView ivExhibitionImage;
+    private KenBurnsView ivExhibitionImage;
 
     private TextView tvExhibitionTitle;
     private TextView tvDate;
@@ -80,7 +81,7 @@ public class ExhibitionDetailFragment extends Fragment {
             }
         });
 
-        ivExhibitionImage = (ImageView) rootView.findViewById(R.id.ivExhibitionImage);
+        ivExhibitionImage = (KenBurnsView) rootView.findViewById(R.id.kbvExhibitionImage);
         tvExhibitionTitle = (TextView) rootView.findViewById(R.id.tvExhibitionTitle);
         tvDate = (TextView) rootView.findViewById(R.id.tvDate);
         tvLocation = (TextView) rootView.findViewById(R.id.tvLocation);

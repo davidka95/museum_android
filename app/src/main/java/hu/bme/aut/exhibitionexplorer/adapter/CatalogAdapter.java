@@ -39,7 +39,7 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
     public void onBindViewHolder(CatalogViewHolder holder, int position) {
         final Artifact artifact = artifacts.get(position);
         Picasso.with(context).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.mipmap.ic_launcher).into(holder.iconImageView);
+                .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
         holder.nameTextView.setText(artifact.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
 
@@ -58,7 +58,6 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
 
     public void addArtifact(Artifact artifact) {
         artifacts.add(artifact);
-        notifyDataSetChanged();
     }
 
     public class CatalogViewHolder extends RecyclerView.ViewHolder {
