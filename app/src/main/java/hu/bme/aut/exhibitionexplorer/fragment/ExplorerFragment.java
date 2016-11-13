@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,12 +42,13 @@ import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
+import hu.bme.aut.exhibitionexplorer.quiz.QuizHelper;
 
 /**
  * Created by Adam on 2016. 10. 28..
  */
 
-public class ExplorerFragment extends Fragment{
+public class ExplorerFragment extends Fragment implements View.OnClickListener{
 
     public static String TAG = "ExplorerFragment";
 
@@ -56,7 +58,13 @@ public class ExplorerFragment extends Fragment{
     private TextView tvArtifactName;
     private TextView tvArtifactDescription;
     private FloatingActionButton fabFavorite;
+    private TextView tvQuizQuestion;
+    private Button btnAnswerA;
+    private Button btnAnswerB;
+    private Button btnAnswerC;
+    private Button btnAnswerD;
 
+    private QuizHelper quizHelper;
     Artifact artifact;
 
 
@@ -81,6 +89,12 @@ public class ExplorerFragment extends Fragment{
 
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());
+        quizHelper = new QuizHelper(artifact.getQuiz());
+        tvQuizQuestion.setText(quizHelper.getQuestionTitle());
+        btnAnswerA.setText(quizHelper.getQuestionA());
+        btnAnswerB.setText(quizHelper.getQuestionB());
+        btnAnswerC.setText(quizHelper.getQuestionC());
+        btnAnswerD.setText(quizHelper.getQuestionD());
     }
 
     private void initView(View rootView) {
@@ -96,7 +110,75 @@ public class ExplorerFragment extends Fragment{
         tvArtifactName = (TextView) rootView.findViewById(R.id.tvArtifactName);
         tvArtifactDescription = (TextView) rootView.findViewById(R.id.tvArtifactDescription);
 
+        tvQuizQuestion = (TextView) rootView.findViewById(R.id.tvQuizQuestion);
+        btnAnswerA = (Button) rootView.findViewById(R.id.btnAnswerA);
+        btnAnswerA.setOnClickListener(this);
+        btnAnswerB = (Button) rootView.findViewById(R.id.btnAnswerB);
+        btnAnswerB.setOnClickListener(this);
+        btnAnswerC = (Button) rootView.findViewById(R.id.btnAnswerC);
+        btnAnswerC.setOnClickListener(this);
+        btnAnswerD = (Button) rootView.findViewById(R.id.btnAnswerD);
+        btnAnswerD.setOnClickListener(this);
+
         loadDataToViews();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        boolean correctAnswer = false;
+        correctAnswer = isCorrectAnswer(id);
+        setAnswerViewColor(correctAnswer, v);
+    }
+
+    private boolean isCorrectAnswer(int id){
+        boolean correctAnswer = false;
+        switch (id){
+            case R.id.btnAnswerA:
+                correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_A);
+                break;
+            case R.id.btnAnswerB:
+                correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_B);
+                break;
+            case R.id.btnAnswerC:
+                correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_C);
+                break;
+            case R.id.btnAnswerD:
+                correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_D);
+                break;
+        };
+
+        return correctAnswer;
+    }
+
+    private  void setAnswerViewColor(boolean correctAnswer, View v){
+        if (correctAnswer){
+            v.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+            btnAnswerA.setClickable(false);
+        } else {
+            v.setBackgroundColor(getResources().getColor(R.color.in_correct_answer));
+            int correctAnswerID = quizHelper.getCorrectAnswerID();
+            if (correctAnswerID == QuizHelper.ANSWER_A){
+                btnAnswerA.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+            } else if (correctAnswerID == QuizHelper.ANSWER_B){
+                btnAnswerB.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+            }  else if (correctAnswerID == QuizHelper.ANSWER_C){
+                btnAnswerC.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+            } else if (correctAnswerID == QuizHelper.ANSWER_D){
+                btnAnswerD.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+            }
+
+
+        }
+        setUnClickableButton();
+
+    }
+
+    private void setUnClickableButton(){
+        btnAnswerA.setClickable(false);
+        btnAnswerB.setClickable(false);
+        btnAnswerC.setClickable(false);
+        btnAnswerD.setClickable(false);
     }
 
    /* private void verifyBluetooth() {

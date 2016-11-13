@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity
             setNavigationViewTitle(R.id.nav_explore);
             nearestIBeacon = null;
             if (exhibition != null) {
-                //showFragmentWithNoBackStack(new Fragment(), null);
+                showFragmentWithNoBackStack(new Fragment(), null);
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }

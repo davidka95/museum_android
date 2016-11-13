@@ -10,4 +10,6 @@
     <color name="divider">#BDBDBD</color>
     <color name="half_white">#7dffffff</color>
     <color name="transparent_grey">#4b000000</color>
+    <color name="correct_answer">#8BC34A</color>
+    <color name="in_correct_answer">#bf360c</color>
 </resources>
