@@ -96,12 +96,14 @@ public class CatalogFragment extends Fragment {
     final AsyncTask<DataSnapshot, Void, CatalogAdapter> asyncTask = new AsyncTask<DataSnapshot, Void, CatalogAdapter>() {
         @Override
         protected CatalogAdapter doInBackground(DataSnapshot... params) {
+            if (artifactsHere != null){
             for (DataSnapshot datasnapshot: params[0].getChildren()){
                 if(artifactsHere.containsKey(datasnapshot.getKey())){
                     Artifact artifact = datasnapshot.getValue(Artifact.class);
                     artifact.setUuID(datasnapshot.getKey());
                     adapter.addArtifact(artifact);
                 }
+            }
             }
 
             return adapter;

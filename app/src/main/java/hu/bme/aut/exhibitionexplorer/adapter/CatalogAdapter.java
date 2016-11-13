@@ -38,8 +38,13 @@ public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogV
     @Override
     public void onBindViewHolder(CatalogViewHolder holder, int position) {
         final Artifact artifact = artifacts.get(position);
-        Picasso.with(context).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
+        try {
+            Picasso.with(context).load(artifact.getImageURL()).fit().centerCrop()
+                    .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
+        } catch (Exception e){
+            Picasso.with(context).load(R.drawable.no_image_found).into(holder.iconImageView);
+        }
+
         holder.nameTextView.setText(artifact.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
 

@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements SignInFragment.O
 
     @Override
     public void onSuccesfullLogin() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(LoginActivity.this, LoadingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

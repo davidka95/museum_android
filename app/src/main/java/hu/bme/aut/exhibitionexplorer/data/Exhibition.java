@@ -36,6 +36,9 @@ public class Exhibition implements Parcelable {
     @PropertyName("beacon")
     private boolean beacon;
 
+    @PropertyName("beaconRegion")
+    private String beaconRegion;
+
     @PropertyName("description")
     private String description;
 
@@ -82,6 +85,14 @@ public class Exhibition implements Parcelable {
 
     public void setBeacon(boolean beaconID) {
         this.beacon = beaconID;
+    }
+
+    public String getBeaconRegion() {
+        return beaconRegion;
+    }
+
+    public void setBeaconRegion(String beaconRegion) {
+        this.beaconRegion = beaconRegion;
     }
 
     public String getDescription() {
@@ -136,6 +147,7 @@ public class Exhibition implements Parcelable {
         UuID = in.readString();
         artifactsHere = (HashMap) in.readValue(HashMap.class.getClassLoader());
         beacon = in.readByte() != 0x00;
+        beaconRegion = in.readString();
         description = in.readString();
         imageURL = in.readString();
         inMuseum = in.readString();
@@ -155,6 +167,7 @@ public class Exhibition implements Parcelable {
         dest.writeString(UuID);
         dest.writeValue(artifactsHere);
         dest.writeByte((byte) (beacon ? 0x01 : 0x00));
+        dest.writeString(beaconRegion);
         dest.writeString(description);
         dest.writeString(imageURL);
         dest.writeString(inMuseum);
@@ -176,4 +189,6 @@ public class Exhibition implements Parcelable {
             return new Exhibition[size];
         }
     };
+
+
 }
