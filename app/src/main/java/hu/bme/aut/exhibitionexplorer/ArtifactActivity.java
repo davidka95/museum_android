@@ -9,8 +9,9 @@ import android.view.View;
 
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.fragment.ArtifactDetailFragment;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 
-public class ArtifactActivity extends AppCompatActivity {
+public class ArtifactActivity extends AppCompatActivity implements OnFavoriteListener {
     Toolbar toolbar;
 
     @Override
@@ -38,5 +39,15 @@ public class ArtifactActivity extends AppCompatActivity {
         FragmentTransaction localFragmentTransaction = getSupportFragmentManager().beginTransaction();
         localFragmentTransaction.replace(R.id.fragment_container, fragment, tag)
                 .commit();
+    }
+
+    @Override
+    public void ArtifactToFavorite(Artifact artifact) {
+        artifact.save();
+    }
+
+    @Override
+    public void ArtifactRemovedFromFavorite(Artifact artifact) {
+        artifact.delete();
     }
 }
