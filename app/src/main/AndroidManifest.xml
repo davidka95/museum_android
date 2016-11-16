@@ -4,8 +4,6 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-feature android:name="android.hardware.camera" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +14,9 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
@@ -27,8 +27,7 @@
         <activity
             android:name=".ArtifactActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".LoadingActivity"
+        <activity android:name=".LoadingActivity"
             android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,6 +35,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <meta-data
+            android:name="DATABASE"
+            android:value="favorites.db" />
+        <meta-data
+            android:name="VERSION"
+            android:value="2" />
+        <meta-data
+            android:name="QUERY_LOG"
+            android:value="true" />
+        <meta-data
+            android:name="DOMAIN_PACKAGE_NAME"
+            android:value="hu.bme.aut.exhibitionexplorer" />
+
+
         <activity android:name=".QrReaderActivity"></activity>
     </application>
 

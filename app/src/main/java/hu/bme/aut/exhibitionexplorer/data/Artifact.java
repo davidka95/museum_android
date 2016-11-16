@@ -5,12 +5,13 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.PropertyName;
+import com.orm.SugarRecord;
 
 /**
  * Created by Adam on 2016. 11. 01..
  */
 
-public class Artifact implements Parcelable {
+public class Artifact extends SugarRecord implements Parcelable {
     @Exclude
     public static final String KEY_ARTIFACT_PARCELABLE = "KEY_ARTIFACT_PARCELABLE";
 

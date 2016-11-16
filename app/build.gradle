@@ -33,6 +33,7 @@ dependencies {
     compile 'com.flaviofaria:kenburnsview:1.0.7'
     compile 'org.altbeacon:android-beacon-library:2.9.1'
     compile 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.1'
+    compile 'com.github.satyan:sugar:1.4'
     testCompile 'junit:junit:4.12'
 }
 

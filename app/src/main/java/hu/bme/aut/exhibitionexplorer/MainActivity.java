@@ -45,12 +45,14 @@ import hu.bme.aut.exhibitionexplorer.data.BeaconData;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
+import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        CatalogFragment.OnArtifactItemClickListener, BeaconConsumer {
+        OnArtifactItemClickListener, BeaconConsumer {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
@@ -186,6 +188,7 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_favorite) {
             setNavigationViewTitle(R.id.nav_favorite);
+            showFragmentWithNoBackStack(new FavoriteFragment(), FavoriteFragment.TAG);
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_help_and_feedbeck) {
