@@ -52,11 +52,12 @@ import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        CatalogFragment.OnArtifactItemClickListener, BeaconConsumer {
+        OnArtifactItemClickListener, BeaconConsumer {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final String BEACON_TAG = "BEACON_TAG";

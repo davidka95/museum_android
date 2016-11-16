@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 /**
  * Created by Zay on 2016.11.05..
@@ -22,9 +23,9 @@ import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 public class CatalogAdapter extends RecyclerView.Adapter<CatalogAdapter.CatalogViewHolder> {
     private ArrayList<Artifact> artifacts;
     private Context context;
-    private CatalogFragment.OnArtifactItemClickListener itemClickListener;
+    private OnArtifactItemClickListener itemClickListener;
 
-    public CatalogAdapter(Context context, CatalogFragment.OnArtifactItemClickListener listener) {
+    public CatalogAdapter(Context context, OnArtifactItemClickListener listener) {
         artifacts = new ArrayList<>();
         this.context = context;
         itemClickListener = listener;

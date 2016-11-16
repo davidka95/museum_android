@@ -46,6 +46,7 @@
     <string name="parameter_qr_code_text">QR-codes:   %1$s</string>
     <string name="parameter_quiz_text">Quiz:   %1$s</string>
     <string name="catalog_detail_toolbar_title">Catalog Detail</string>
+    <string name="artifact_detail_toolbar_title">Artifact Details</string>
     <string-array name="checked_nav_text">
         <item>@string/nav_txt_exhibition</item>
         <item>@string/nav_txt_catalog</item>

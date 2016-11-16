@@ -24,6 +24,7 @@ import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 /**
  * Created by Adam on 2016. 10. 29..
@@ -51,7 +52,7 @@ public class CatalogFragment extends Fragment {
         if (activity instanceof OnArtifactItemClickListener) {
             onItemClickListener = (OnArtifactItemClickListener) activity;
         } else {
-            throw new RuntimeException("Activity must implement CatalogFragment.OnArtifactItemClickListener interface");
+            throw new RuntimeException("Activity(" +activity.toString() +") must implement OnArtifactItemClickListener interface");
         }
     }
 
@@ -89,9 +90,6 @@ public class CatalogFragment extends Fragment {
         return rootView;
     }
 
-    public interface OnArtifactItemClickListener {
-        public void onArtifactItemClick(Artifact artifact);
-    }
 
     final AsyncTask<DataSnapshot, Void, CatalogAdapter> asyncTask = new AsyncTask<DataSnapshot, Void, CatalogAdapter>() {
         @Override

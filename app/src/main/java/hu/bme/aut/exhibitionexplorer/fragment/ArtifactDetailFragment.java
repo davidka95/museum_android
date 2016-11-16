@@ -67,8 +67,8 @@ public class ArtifactDetailFragment extends Fragment {
         fabFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if(Artifact.find(Artifact.class, "UuiD = ?", artifact.getUuID()).isEmpty())
                 onFavoriteAddedListener.ArtifactToFavorite(artifact);
+                disableFabButton();
 
                 final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView;
                 Snackbar addedSnackbar = Snackbar.make(coordinatorLayout,
@@ -82,6 +82,7 @@ public class ArtifactDetailFragment extends Fragment {
                                 Snackbar undoSnackbar = Snackbar.make(coordinatorLayout, "Removed from favorites", Snackbar.LENGTH_SHORT);
                                 undoSnackbar.show();
                                 onFavoriteAddedListener.ArtifactRemovedFromFavorite(artifact);
+                                enableFabButton();
                                 break;
                             default:
                                 break;
@@ -98,11 +99,27 @@ public class ArtifactDetailFragment extends Fragment {
             }
         });
 
+        setFabButton();
+
         ivArtifactImage = (KenBurnsView) rootView.findViewById(R.id.kvArtifactImage);
         tvArtifactName = (TextView) rootView.findViewById(R.id.tvArtifactName);
         tvArtifactDescription = (TextView) rootView.findViewById(R.id.tvArtifactDescription);
 
         loadDataToViews();
+    }
+
+    private void setFabButton() {
+        if (!Artifact.find(Artifact.class, "name = ?", new String[]{artifact.getName()}).isEmpty()) {
+            disableFabButton();
+        } else enableFabButton();
+    }
+
+    private void enableFabButton() {
+        fabFavorite.setVisibility(FloatingActionButton.VISIBLE);
+    }
+
+    private void disableFabButton() {
+        fabFavorite.setVisibility(FloatingActionButton.GONE);
     }
 
     private void loadDataToViews() {

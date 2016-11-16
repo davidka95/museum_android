@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -18,6 +19,7 @@ import hu.bme.aut.exhibitionexplorer.adapter.FavoriteAdapter;
 import hu.bme.aut.exhibitionexplorer.adapter.TouchHelperCallback;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 /**
  * Created by Zay on 2016.11.14..
@@ -29,17 +31,30 @@ public class FavoriteFragment extends Fragment {
     protected FavoriteAdapter adapter;
     protected RecyclerView recyclerView;
 
+    OnArtifactItemClickListener onItemClickListener;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof OnArtifactItemClickListener) {
+            onItemClickListener = (OnArtifactItemClickListener) activity;
+        } else {
+            throw new RuntimeException("Activity(" +activity.toString() + ") must implement OnArtifactItemClickListener interface");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favorite, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.FragmentRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new FavoriteAdapter(getContext());
+        adapter = new FavoriteAdapter(getContext(), onItemClickListener);
         loadItemsInBackground();
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new TouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new TouchHelperCallback(adapter, recyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         return rootView;
@@ -54,9 +69,9 @@ public class FavoriteFragment extends Fragment {
             }
 
             @Override
-            protected void onPostExecute(List<Artifact> shoppingItems) {
-                super.onPostExecute(shoppingItems);
-                adapter.update(shoppingItems);
+            protected void onPostExecute(List<Artifact> favorites) {
+                super.onPostExecute(favorites);
+                adapter.update(favorites);
             }
         }.execute();
     }

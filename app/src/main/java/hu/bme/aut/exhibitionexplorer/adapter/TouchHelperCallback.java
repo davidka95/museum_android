@@ -11,28 +11,27 @@ import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
 
 public class TouchHelperCallback extends ItemTouchHelper.Callback {
     private final FavoriteTouchHelperAdapter mAdapter;
+    private final RecyclerView recyclerView;
 
-    public TouchHelperCallback(FavoriteTouchHelperAdapter mAdapter) {
+    public TouchHelperCallback(FavoriteTouchHelperAdapter mAdapter, RecyclerView recyclerView) {
         this.mAdapter = mAdapter;
+        this.recyclerView = recyclerView;
     }
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        int dragFlags = 0;
+        int swipeFlags = ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override
-    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                          RecyclerView.ViewHolder target) {
-        mAdapter.onItemMove(viewHolder.getAdapterPosition(),
-                target.getAdapterPosition());
-        return true;
+    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        return false;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        mAdapter.onItemDismiss(viewHolder.getAdapterPosition(), recyclerView);
     }
 }

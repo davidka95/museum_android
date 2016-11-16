@@ -1,7 +1,11 @@
 package hu.bme.aut.exhibitionexplorer.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 /**
  * Created by Zay on 2016.11.14..
@@ -26,10 +31,12 @@ import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> implements FavoriteTouchHelperAdapter {
     private ArrayList<Artifact> favorites;
     private Context context;
+    OnArtifactItemClickListener itemClickListener;
 
-    public FavoriteAdapter(Context context) {
+    public FavoriteAdapter(Context context, OnArtifactItemClickListener listener) {
         favorites = new ArrayList<>();
         this.context = context;
+        itemClickListener = listener;
     }
 
     @Override
@@ -48,7 +55,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
         }
 
         holder.nameTextView.setText(artifact.getName());
-        //TODO itemclick
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                itemClickListener.onArtifactItemClick(artifact);
+            }
+        });
     }
 
     @Override
@@ -73,24 +85,39 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
         }
     }
 
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        if (fromPosition < toPosition) {
-            for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(favorites, i, i + 1);
-            }
-        } else {
-            for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(favorites, i, i - 1);
-            }
-        }
-        notifyItemMoved(fromPosition, toPosition);
-    }
 
     @Override
-    public void onItemDismiss(int position) {
+    public void onItemDismiss(final int position, final RecyclerView recyclerView) {
+        final Artifact tmp = favorites.get(position);
         favorites.get(position).delete();
         favorites.remove(position);
         notifyItemRemoved(position);
+
+        Snackbar addedSnackbar = Snackbar.make(recyclerView,
+                "Artifact deleted from favorites", Snackbar.LENGTH_LONG);
+        addedSnackbar.setCallback(new Snackbar.Callback() {
+            @Override
+            public void onDismissed(Snackbar snackbar, int event) {
+                super.onDismissed(snackbar, event);
+                switch (event) {
+                    case Snackbar.Callback.DISMISS_EVENT_ACTION:
+                        Snackbar undoSnackbar = Snackbar.make(recyclerView, "Restored to favorites", Snackbar.LENGTH_SHORT);
+                        undoSnackbar.show();
+                        favorites.add(position, tmp);
+                        favorites.get(position).save();
+                        notifyItemInserted(position);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        addedSnackbar.setAction("Undo", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        })
+                .setActionTextColor(Color.YELLOW);
+        addedSnackbar.show();
     }
 }
