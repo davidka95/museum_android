@@ -48,11 +48,12 @@ import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        OnArtifactItemClickListener, BeaconConsumer {
+        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         exhibition = getIntent().getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
-        if (exhibition !=null){
+        if (exhibition != null) {
             artifactsHere = exhibition.getArtifactsHere();
         }
 
@@ -237,7 +238,7 @@ public class MainActivity extends AppCompatActivity
         long id = item.getItemId();
         if (id == R.id.menu_item_exhibition) {
             startExhibitionActivity();
-        } else if (id == R.id.menu_item_qr_code){
+        } else if (id == R.id.menu_item_qr_code) {
             startQrReaderActivity();
         }
         return super.onOptionsItemSelected(item);
@@ -336,7 +337,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         try {
-            if(exhibition != null){
+            if (exhibition != null) {
                 UUID uuid = UUID.fromString(exhibition.getBeaconRegion());
                 beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", Identifier.fromUuid(uuid)
                         , null, null));
@@ -351,33 +352,43 @@ public class MainActivity extends AppCompatActivity
             final Bundle bundle = new Bundle();
             FirebaseDatabase.getInstance().getReference().child("beacons").child(beacon.getId3().toString())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    BeaconData beaconData = dataSnapshot.getValue(BeaconData.class);
-                    beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
-                    if(beaconData!=null){
-                    for (Artifact artifact : artifacts) {
-                        if (artifact.getUuID().equals(beaconData.getArtifactId())) {
-                            bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-                            Fragment explorerFragment = new ExplorerFragment();
-                            explorerFragment.setArguments(bundle);
-                            showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
-                            break;
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            BeaconData beaconData = dataSnapshot.getValue(BeaconData.class);
+                            beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
+                            if (beaconData != null) {
+                                for (Artifact artifact : artifacts) {
+                                    if (artifact.getUuID().equals(beaconData.getArtifactId())) {
+                                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+                                        Fragment explorerFragment = new ExplorerFragment();
+                                        explorerFragment.setArguments(bundle);
+                                        showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
+                                        break;
+                                    }
+                                }
+                            }
+
                         }
-                    }
-                    }
 
-                }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+                        }
+                    });
         }
 
         Log.d(BEACON_TAG, "manageBeacon: " + beacon.getId1() + " ID");
 
+    }
+
+    @Override
+    public void ArtifactToFavorite(Artifact artifact) {
+        artifact.save();
+    }
+
+    @Override
+    public void ArtifactRemovedFromFavorite(Artifact artifact) {
+        artifact.delete();
     }
 
     class LoadArtifactHelper extends AsyncTask<DataSnapshot, Void, Void> {
