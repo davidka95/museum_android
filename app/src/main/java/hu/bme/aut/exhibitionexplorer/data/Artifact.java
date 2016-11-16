@@ -15,6 +15,9 @@ public class Artifact implements Parcelable {
     public static final String KEY_ARTIFACT_PARCELABLE = "KEY_ARTIFACT_PARCELABLE";
 
     @Exclude
+    public static final String KEY_ARTIFACT_ID = "KEY_ARTIFACT_ID";
+
+    @Exclude
     private String UuID;
 
     @PropertyName("description")
