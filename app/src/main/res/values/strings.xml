@@ -56,4 +56,5 @@
     <string name="sorry_bluetooth_not_supported">Bluetooth LE not supported</string>
     <string name="title_bluetooth_not_enabled">Bluetooth not enabled</string>
     <string name="enable_bluetooth">Enable</string>
+    <string name="there_is_no_favorite">You haven\'t got any favorites yet.</string>
 </resources>

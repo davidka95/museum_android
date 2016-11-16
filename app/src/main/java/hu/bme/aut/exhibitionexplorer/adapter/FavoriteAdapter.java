@@ -2,10 +2,8 @@ package hu.bme.aut.exhibitionexplorer.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +13,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import hu.bme.aut.exhibitionexplorer.R;
@@ -32,11 +29,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
     private ArrayList<Artifact> favorites;
     private Context context;
     OnArtifactItemClickListener itemClickListener;
+    FavoriteFragment parentFragment;
 
-    public FavoriteAdapter(Context context, OnArtifactItemClickListener listener) {
+    public FavoriteAdapter(Context context, OnArtifactItemClickListener listener, FavoriteFragment parent) {
         favorites = new ArrayList<>();
         this.context = context;
         itemClickListener = listener;
+        parentFragment = parent;
     }
 
     @Override
@@ -92,6 +91,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
         favorites.get(position).delete();
         favorites.remove(position);
         notifyItemRemoved(position);
+        parentFragment.listSizeChanged();
 
         Snackbar addedSnackbar = Snackbar.make(recyclerView,
                 "Artifact deleted from favorites", Snackbar.LENGTH_LONG);
@@ -106,6 +106,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                         favorites.add(position, tmp);
                         favorites.get(position).save();
                         notifyItemInserted(position);
+                        parentFragment.listSizeChanged();
                         break;
                     default:
                         break;

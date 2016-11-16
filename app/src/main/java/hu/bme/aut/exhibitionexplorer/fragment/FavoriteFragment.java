@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -18,7 +19,6 @@ import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.FavoriteAdapter;
 import hu.bme.aut.exhibitionexplorer.adapter.TouchHelperCallback;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
-import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 /**
@@ -30,6 +30,7 @@ public class FavoriteFragment extends Fragment {
     public static final String TAG = "FavoriteFragment";
     protected FavoriteAdapter adapter;
     protected RecyclerView recyclerView;
+    protected TextView emptyTextView;
 
     OnArtifactItemClickListener onItemClickListener;
 
@@ -48,17 +49,32 @@ public class FavoriteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_favorite, container, false);
+        emptyTextView = (TextView) rootView.findViewById(R.id.empty_view);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.FragmentRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new FavoriteAdapter(getContext(), onItemClickListener);
+        adapter = new FavoriteAdapter(getContext(), onItemClickListener, this);
         loadItemsInBackground();
         recyclerView.setAdapter(adapter);
-
         ItemTouchHelper.Callback callback = new TouchHelperCallback(adapter, recyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         return rootView;
     }
+
+    private void setViewsInFragment() {
+        if (adapter.getItemCount() == 0) {
+            recyclerView.setVisibility(View.GONE);
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyTextView.setVisibility(View.GONE);
+        }
+    }
+
+    public void listSizeChanged() {
+        setViewsInFragment();
+    };
 
     private void loadItemsInBackground() {
         new AsyncTask<Void, Void, List<Artifact>>() {
@@ -72,6 +88,7 @@ public class FavoriteFragment extends Fragment {
             protected void onPostExecute(List<Artifact> favorites) {
                 super.onPostExecute(favorites);
                 adapter.update(favorites);
+                setViewsInFragment();
             }
         }.execute();
     }
