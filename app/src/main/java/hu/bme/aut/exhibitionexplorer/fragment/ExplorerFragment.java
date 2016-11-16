@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,13 +46,14 @@ import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
+import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 import hu.bme.aut.exhibitionexplorer.quiz.QuizHelper;
 
 /**
  * Created by Adam on 2016. 10. 28..
  */
 
-public class ExplorerFragment extends Fragment implements View.OnClickListener{
+public class ExplorerFragment extends Fragment implements View.OnClickListener {
 
     public static String TAG = "ExplorerFragment";
 
@@ -67,6 +72,19 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
     private QuizHelper quizHelper;
     Artifact artifact;
 
+    private OnFavoriteListener onFavoriteAddedListener;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof OnFavoriteListener) {
+            onFavoriteAddedListener = (OnFavoriteListener) activity;
+        } else {
+            throw new RuntimeException("Activity(" + activity.toString() + ") must implement OnFavoriteListener interface");
+        }
+    }
+
 
     @Nullable
     @Override
@@ -83,7 +101,7 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
     }
 
     private void loadDataToViews() {
-        Log.d("a kiirando: ",artifact.getImageURL());
+        Log.d("a kiirando: ", artifact.getImageURL());
         Picasso.with(getContext()).load(artifact.getImageURL()).fit().centerCrop()
                 .placeholder(R.mipmap.ic_launcher).into(ivArtifactImage);
 
@@ -97,14 +115,44 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
         btnAnswerD.setText(quizHelper.getQuestionD());
     }
 
-    private void initView(View rootView) {
+    private void initView(final View rootView) {
         fabFavorite = (FloatingActionButton) rootView.findViewById(R.id.fabFavorite);
         fabFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Még nincs implementálva", Toast.LENGTH_SHORT).show();
+                onFavoriteAddedListener.ArtifactToFavorite(artifact);
+                disableFabButton();
+
+                final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView;
+                Snackbar addedSnackbar = Snackbar.make(coordinatorLayout,
+                        "Artifact added to favorites", Snackbar.LENGTH_LONG);
+                addedSnackbar.setCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar snackbar, int event) {
+                        super.onDismissed(snackbar, event);
+                        switch (event) {
+                            case Snackbar.Callback.DISMISS_EVENT_ACTION:
+                                Snackbar undoSnackbar = Snackbar.make(coordinatorLayout, "Removed from favorites", Snackbar.LENGTH_SHORT);
+                                undoSnackbar.show();
+                                onFavoriteAddedListener.ArtifactRemovedFromFavorite(artifact);
+                                enableFabButton();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                addedSnackbar.setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                })
+                        .setActionTextColor(Color.YELLOW);
+                addedSnackbar.show();
             }
         });
+
+        setFabButton();
 
         ivArtifactImage = (KenBurnsView) rootView.findViewById(R.id.kvArtifactImage);
         tvArtifactName = (TextView) rootView.findViewById(R.id.tvArtifactName);
@@ -123,6 +171,20 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
         loadDataToViews();
     }
 
+    private void setFabButton() {
+        if (!Artifact.find(Artifact.class, "name = ?", new String[]{artifact.getName()}).isEmpty()) {
+            disableFabButton();
+        } else enableFabButton();
+    }
+
+    private void enableFabButton() {
+        fabFavorite.setVisibility(FloatingActionButton.VISIBLE);
+    }
+
+    private void disableFabButton() {
+        fabFavorite.setVisibility(FloatingActionButton.GONE);
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -131,9 +193,9 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
         setAnswerViewColor(correctAnswer, v);
     }
 
-    private boolean isCorrectAnswer(int id){
+    private boolean isCorrectAnswer(int id) {
         boolean correctAnswer = false;
-        switch (id){
+        switch (id) {
             case R.id.btnAnswerA:
                 correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_A);
                 break;
@@ -146,25 +208,26 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
             case R.id.btnAnswerD:
                 correctAnswer = quizHelper.isCorrectAnswer(QuizHelper.ANSWER_D);
                 break;
-        };
+        }
+        ;
 
         return correctAnswer;
     }
 
-    private  void setAnswerViewColor(boolean correctAnswer, View v){
-        if (correctAnswer){
+    private void setAnswerViewColor(boolean correctAnswer, View v) {
+        if (correctAnswer) {
             v.setBackgroundColor(getResources().getColor(R.color.correct_answer));
             btnAnswerA.setClickable(false);
         } else {
             v.setBackgroundColor(getResources().getColor(R.color.in_correct_answer));
             int correctAnswerID = quizHelper.getCorrectAnswerID();
-            if (correctAnswerID == QuizHelper.ANSWER_A){
+            if (correctAnswerID == QuizHelper.ANSWER_A) {
                 btnAnswerA.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            } else if (correctAnswerID == QuizHelper.ANSWER_B){
+            } else if (correctAnswerID == QuizHelper.ANSWER_B) {
                 btnAnswerB.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            }  else if (correctAnswerID == QuizHelper.ANSWER_C){
+            } else if (correctAnswerID == QuizHelper.ANSWER_C) {
                 btnAnswerC.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            } else if (correctAnswerID == QuizHelper.ANSWER_D){
+            } else if (correctAnswerID == QuizHelper.ANSWER_D) {
                 btnAnswerD.setBackgroundColor(getResources().getColor(R.color.correct_answer));
             }
 
@@ -174,7 +237,7 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener{
 
     }
 
-    private void setUnClickableButton(){
+    private void setUnClickableButton() {
         btnAnswerA.setClickable(false);
         btnAnswerB.setClickable(false);
         btnAnswerC.setClickable(false);
