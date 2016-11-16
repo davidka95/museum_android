@@ -1,6 +1,5 @@
 package hu.bme.aut.exhibitionexplorer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -25,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -34,7 +32,6 @@ import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -43,11 +40,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
-import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.BeaconData;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
-import hu.bme.aut.exhibitionexplorer.fragment.ArtifactDetailFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
@@ -60,7 +55,9 @@ public class MainActivity extends AppCompatActivity
         OnArtifactItemClickListener, BeaconConsumer {
 
     public static final int REQUEST_EXHIBITION = 102;
+    public static final int REQUEST_QR_READER = 103;
     public static final String BEACON_TAG = "BEACON_TAG";
+
     public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
 
     private String exhibitionUuID;
@@ -79,22 +76,6 @@ public class MainActivity extends AppCompatActivity
     private BeaconManager beaconManager;
 
     private Toolbar toolbar;
-
-    private void getArtifact() {
-        FirebaseDatabase.getInstance().getReference().child("artifacts").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                LoadArtifactHelper loadArtifactHelper = new LoadArtifactHelper();
-                loadArtifactHelper.execute(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +129,22 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void getArtifact() {
+        artifacts.clear();
+        FirebaseDatabase.getInstance().getReference().child("artifacts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                LoadArtifactHelper loadArtifactHelper = new LoadArtifactHelper();
+                loadArtifactHelper.execute(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void loadLoginActivity() {
         Intent startLoginActivity = new Intent(this, LoginActivity.class);
         startLoginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -197,10 +194,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_help_and_feedbeck) {
 
         } else if (id == R.id.nav_sign_out) {
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString(KEY_CHOOSED_EXHIBITION, null);
-            editor.commit();
+            writeExhibitionUuIDToSharedPreferences(null);
             mFirebaseAuth.signOut();
             loadLoginActivity();
         }
@@ -243,8 +237,15 @@ public class MainActivity extends AppCompatActivity
         long id = item.getItemId();
         if (id == R.id.menu_item_exhibition) {
             startExhibitionActivity();
+        } else if (id == R.id.menu_item_qr_code){
+            startQrReaderActivity();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startQrReaderActivity() {
+        Intent qrReaderIntent = new Intent(this, QrReaderActivity.class);
+        startActivityForResult(qrReaderIntent, REQUEST_QR_READER);
     }
 
     private void initNavigationDrawer() {
@@ -277,14 +278,32 @@ public class MainActivity extends AppCompatActivity
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_EXHIBITION) {
                 exhibition = data.getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putString(KEY_CHOOSED_EXHIBITION, exhibition.getUuID());
-                editor.commit();
-                onNavigationItemSelected(navigationView.getMenu().findItem(checkedNavMenuID));
+                writeExhibitionUuIDToSharedPreferences(exhibition.getUuID());
+                artifactsHere = exhibition.getArtifactsHere();
+                getArtifact();
+
                 onStart();
+            } else if (requestCode == REQUEST_QR_READER) {
+                Bundle bundle = new Bundle();
+                String artifactID = data.getStringExtra(Artifact.KEY_ARTIFACT_ID);
+                for (Artifact artifact : artifacts) {
+                    if (artifact.getUuID().equals(artifactID)) {
+                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+                        Fragment explorerFragment = new ExplorerFragment();
+                        explorerFragment.setArguments(bundle);
+                        showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
+                        break;
+                    }
+                }
             }
         }
+    }
+
+    private void writeExhibitionUuIDToSharedPreferences(String exhibitionUuID) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(KEY_CHOOSED_EXHIBITION, exhibition.getUuID());
+        editor.commit();
     }
 
     @Override
