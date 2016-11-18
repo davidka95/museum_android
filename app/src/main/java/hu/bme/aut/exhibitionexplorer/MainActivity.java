@@ -47,6 +47,7 @@ import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
+import hu.bme.aut.exhibitionexplorer.fragment.SearchBeaconFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
     public static final String BEACON_TAG = "BEACON_TAG";
+    public static final String KEY_NEAREST_BEACON = "KEY_NEAREST_BEACON";
+    public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
+    public static final String KEY_CHECKED_NAV_MENU_ID = "KEY_CHECKED_NAV_MENU_ID";
 
     public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
 
@@ -70,9 +74,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private NavigationView navigationView;
-    private int checkedNavMenuID;
+    private int checkedNavMenuID = R.id.nav_explore;
 
     private String nearestIBeacon = null;
+    private Artifact actualArtifact = null;
 
     private BeaconManager beaconManager;
 
@@ -85,6 +90,12 @@ public class MainActivity extends AppCompatActivity
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        if(savedInstanceState!=null){
+            nearestIBeacon = savedInstanceState.getString(KEY_NEAREST_BEACON);
+            actualArtifact = savedInstanceState.getParcelable(KEY_ACUTAL_ARTIFACT);
+            checkedNavMenuID = savedInstanceState.getInt(KEY_CHECKED_NAV_MENU_ID);
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -146,6 +157,14 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_CHECKED_NAV_MENU_ID, checkedNavMenuID);
+        outState.putString(KEY_NEAREST_BEACON, nearestIBeacon);
+        outState.putParcelable(KEY_ACUTAL_ARTIFACT, actualArtifact);
+    }
+
     private void loadLoginActivity() {
         Intent startLoginActivity = new Intent(this, LoginActivity.class);
         startLoginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -167,12 +186,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.nav_explore) {
             setNavigationViewTitle(R.id.nav_explore);
-            nearestIBeacon = null;
             if (exhibition != null) {
-                showFragmentWithNoBackStack(new Fragment(), null);
+                if (nearestIBeacon == null){
+                    showFragmentWithNoBackStack(new SearchBeaconFragment(), null);
+                } else if (actualArtifact!= null){
+                    showExplorerFragmentByID(actualArtifact.getUuID(), false);
+                }
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
@@ -285,17 +306,27 @@ public class MainActivity extends AppCompatActivity
 
                 onStart();
             } else if (requestCode == REQUEST_QR_READER) {
-                Bundle bundle = new Bundle();
                 String artifactID = data.getStringExtra(Artifact.KEY_ARTIFACT_ID);
-                for (Artifact artifact : artifacts) {
-                    if (artifact.getUuID().equals(artifactID)) {
-                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-                        Fragment explorerFragment = new ExplorerFragment();
-                        explorerFragment.setArguments(bundle);
-                        showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
-                        break;
-                    }
+                showExplorerFragmentByID(artifactID, true);
+            }
+        }
+    }
+
+    public void showExplorerFragmentByID(String artifactID, boolean withAnimation){
+        Bundle bundle = new Bundle();
+        for (Artifact artifact : artifacts) {
+            if (artifact.getUuID().equals(artifactID)) {
+                bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+                actualArtifact = artifact;
+                Fragment explorerFragment = new ExplorerFragment();
+                explorerFragment.setArguments(bundle);
+                if (withAnimation){
+                    showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
+                } else {
+                    showFragmentWithNoBackStack(explorerFragment, ExplorerFragment.TAG);
                 }
+
+                break;
             }
         }
     }
@@ -315,9 +346,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initCheckedItem() {
-        navigationView.setCheckedItem(R.id.nav_explore);
-        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_explore));
-        setNavigationViewTitle(R.id.nav_explore);
+        navigationView.setCheckedItem(checkedNavMenuID);
+        onNavigationItemSelected(navigationView.getMenu().findItem(checkedNavMenuID));
+        setNavigationViewTitle(checkedNavMenuID);
     }
 
     private void setNavigationViewTitle(int id) {
@@ -354,18 +385,11 @@ public class MainActivity extends AppCompatActivity
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            BeaconData beaconData = dataSnapshot.getValue(BeaconData.class);
+                            BeaconData beaconData;
+                            beaconData = dataSnapshot.getValue(BeaconData.class);
                             beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
-                            if (beaconData != null) {
-                                for (Artifact artifact : artifacts) {
-                                    if (artifact.getUuID().equals(beaconData.getArtifactId())) {
-                                        bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-                                        Fragment explorerFragment = new ExplorerFragment();
-                                        explorerFragment.setArguments(bundle);
-                                        showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
-                                        break;
-                                    }
-                                }
+                            if (beaconData!= null) {
+                                showExplorerFragmentByID(beaconData.getArtifactId(), true);
                             }
 
                         }

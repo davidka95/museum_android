@@ -95,15 +95,13 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
 
         initView(rootView);
 
-        //verifyBluetooth();
-
         return rootView;
     }
 
     private void loadDataToViews() {
         Log.d("a kiirando: ", artifact.getImageURL());
         Picasso.with(getContext()).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.mipmap.ic_launcher).into(ivArtifactImage);
+                .placeholder(R.drawable.loading_animation).into(ivArtifactImage);
 
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());
@@ -243,57 +241,4 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         btnAnswerC.setClickable(false);
         btnAnswerD.setClickable(false);
     }
-
-   /* private void verifyBluetooth() {
-
-        try {
-            if (!beaconManager.checkAvailability()) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(getString(R.string.title_bluetooth_not_enabled));
-                builder.setMessage(getString(R.string.enable_bluetooth));
-                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    }
-                });
-                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.setCancelable(false);
-                builder.show();
-            }
-        } catch (RuntimeException e) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-            builder.setTitle(getString(R.string.title_bluetooth_le_not_available));
-            builder.setMessage(getString(R.string.sorry_bluetooth_not_supported));
-            builder.setPositiveButton(android.R.string.ok, null);
-            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    //finish();
-                }
-            });
-            builder.show();
-
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ENABLE_BT) {
-            if (resultCode == getActivity().RESULT_OK) {
-                verifyBluetooth();
-            } else {
-                //finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-    */
 }
