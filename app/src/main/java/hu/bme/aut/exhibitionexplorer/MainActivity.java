@@ -1,15 +1,22 @@
 package hu.bme.aut.exhibitionexplorer;
 
+import android.*;
+import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -58,6 +66,7 @@ public class MainActivity extends AppCompatActivity
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
+    public static final int PERMISSIONS_REQUEST_CAMERA = 201;
     public static final String BEACON_TAG = "BEACON_TAG";
     public static final String KEY_NEAREST_BEACON = "KEY_NEAREST_BEACON";
     public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
@@ -91,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             nearestIBeacon = savedInstanceState.getString(KEY_NEAREST_BEACON);
             actualArtifact = savedInstanceState.getParcelable(KEY_ACUTAL_ARTIFACT);
             checkedNavMenuID = savedInstanceState.getInt(KEY_CHECKED_NAV_MENU_ID);
@@ -189,9 +198,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_explore) {
             setNavigationViewTitle(R.id.nav_explore);
             if (exhibition != null) {
-                if (nearestIBeacon == null){
+                if (nearestIBeacon == null) {
                     showFragmentWithNoBackStack(new SearchBeaconFragment(), null);
-                } else if (actualArtifact!= null){
+                } else if (actualArtifact != null) {
                     showExplorerFragmentByID(actualArtifact.getUuID(), false);
                 }
             } else {
@@ -260,9 +269,58 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.menu_item_exhibition) {
             startExhibitionActivity();
         } else if (id == R.id.menu_item_qr_code) {
-            startQrReaderActivity();
+            startQrReading();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startQrReading() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestCameraPermission();
+        } else {
+            startQrReaderActivity();
+        }
+    }
+
+    private void requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            Snackbar.make(findViewById(R.id.content_main), "Camera access is required to display the camera preview.",
+                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{Manifest.permission.CAMERA},
+                            PERMISSIONS_REQUEST_CAMERA);
+                }
+            }).show();
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startQrReaderActivity();
+                } else {
+                    Snackbar.make(findViewById(R.id.content_main), "Camera access denied, cannot read Qr code",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
     }
 
     private void startQrReaderActivity() {
@@ -312,7 +370,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void showExplorerFragmentByID(String artifactID, boolean withAnimation){
+    public void showExplorerFragmentByID(String artifactID, boolean withAnimation) {
         Bundle bundle = new Bundle();
         for (Artifact artifact : artifacts) {
             if (artifact.getUuID().equals(artifactID)) {
@@ -320,7 +378,7 @@ public class MainActivity extends AppCompatActivity
                 actualArtifact = artifact;
                 Fragment explorerFragment = new ExplorerFragment();
                 explorerFragment.setArguments(bundle);
-                if (withAnimation){
+                if (withAnimation) {
                     showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
                 } else {
                     showFragmentWithNoBackStack(explorerFragment, ExplorerFragment.TAG);
@@ -388,7 +446,7 @@ public class MainActivity extends AppCompatActivity
                             BeaconData beaconData;
                             beaconData = dataSnapshot.getValue(BeaconData.class);
                             beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
-                            if (beaconData!= null) {
+                            if (beaconData != null) {
                                 showExplorerFragmentByID(beaconData.getArtifactId(), true);
                             }
 
