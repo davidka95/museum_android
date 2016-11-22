@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -65,7 +67,9 @@ public class CatalogFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         mArtifactsReference = database.getReference("artifacts");
         exhibition = getArguments().getParcelable(Exhibition.KEY_EXHIBITION_PARCELABLE);
-         artifactsHere = exhibition.getArtifactsHere();
+        artifactsHere = exhibition.getArtifactsHere();
+
+        setHasOptionsMenu(true);
 
 
 
@@ -90,6 +94,11 @@ public class CatalogFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.explorer_with_no_exhibition_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
     final AsyncTask<DataSnapshot, Void, CatalogAdapter> asyncTask = new AsyncTask<DataSnapshot, Void, CatalogAdapter>() {
         @Override

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
@@ -21,6 +22,7 @@ public class ExhibitionActivity extends AppCompatActivity implements ExhibitionF
         setContentView(R.layout.activity_exhibition);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +54,11 @@ public class ExhibitionActivity extends AppCompatActivity implements ExhibitionF
         exhibitionBundle.putParcelable(Exhibition.KEY_EXHIBITION_PARCELABLE, exhibition);
         exhibitionDetailFragment.setArguments(exhibitionBundle);
         showFragmentWithBackStack(exhibitionDetailFragment, ExhibitionDetailFragment.TAG);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
     }
 
     @Override

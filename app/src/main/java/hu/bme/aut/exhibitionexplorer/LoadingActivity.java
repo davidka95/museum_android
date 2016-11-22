@@ -26,8 +26,6 @@ public class LoadingActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +39,7 @@ public class LoadingActivity extends AppCompatActivity {
         }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        exhibitionUuID = sp.getString(KEY_CHOOSED_EXHIBITION, null);
+        exhibitionUuID = sp.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
         getExhibition();
     }
 

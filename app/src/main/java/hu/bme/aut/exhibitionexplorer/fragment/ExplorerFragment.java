@@ -17,6 +17,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -92,6 +94,8 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_explorer, container, false);
 
         artifact = getArguments().getParcelable(Artifact.KEY_ARTIFACT_PARCELABLE);
+
+        setHasOptionsMenu(true);
 
         initView(rootView);
 
@@ -240,5 +244,11 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         btnAnswerB.setClickable(false);
         btnAnswerC.setClickable(false);
         btnAnswerD.setClickable(false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.explorer_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

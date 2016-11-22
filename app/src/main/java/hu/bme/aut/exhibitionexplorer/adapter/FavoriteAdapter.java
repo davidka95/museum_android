@@ -17,6 +17,7 @@ import java.util.List;
 
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
+import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.FavoriteTouchHelperAdapter;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
@@ -27,12 +28,14 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> implements FavoriteTouchHelperAdapter {
     private ArrayList<Artifact> favorites;
+    private ArrayList<Artifact> favoritesCopy;
     private Context context;
-    OnArtifactItemClickListener itemClickListener;
-    FavoriteFragment parentFragment;
+    private OnArtifactItemClickListener itemClickListener;
+    private FavoriteFragment parentFragment;
 
     public FavoriteAdapter(Context context, OnArtifactItemClickListener listener, FavoriteFragment parent) {
         favorites = new ArrayList<>();
+        favoritesCopy = new ArrayList<>();
         this.context = context;
         itemClickListener = listener;
         parentFragment = parent;
@@ -70,6 +73,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
     public void update(List<Artifact> shoppingItems) {
         favorites.clear();
         favorites.addAll(shoppingItems);
+        favoritesCopy.addAll(favorites);
         notifyDataSetChanged();
     }
 
@@ -82,6 +86,21 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
             this.iconImageView = ((ImageView) itemView.findViewById(R.id.FavoriteIconImageView));
             this.nameTextView = ((TextView) itemView.findViewById(R.id.FavoriteNameTextView));
         }
+    }
+
+    public void filter(String text) {
+        favorites.clear();
+        if (text.isEmpty()) {
+            favorites.addAll(favoritesCopy);
+        } else {
+            text = text.toLowerCase();
+            for (Artifact artifact : favoritesCopy) {
+                if (artifact.getName().toLowerCase().contains(text)) {
+                    favorites.add(artifact);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
 

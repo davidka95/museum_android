@@ -95,7 +95,7 @@ public class ExhibitionDetailFragment extends Fragment {
 
     private void loadDataToViews() {
         Picasso.with(getContext()).load(exhibition.getImageURL()).fit().centerCrop()
-                .placeholder(R.mipmap.ic_launcher).into(ivExhibitionImage);
+                .placeholder(R.drawable.loading_animation).into(ivExhibitionImage);
 
         FirebaseDatabase.getInstance().getReference("museums").child(String.valueOf(exhibition.getInMuseum()))
                 .child("address").addValueEventListener(new ValueEventListener() {

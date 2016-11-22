@@ -5,9 +5,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -15,6 +17,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +27,7 @@ import android.widget.LinearLayout;
 import org.altbeacon.beacon.BeaconManager;
 
 import hu.bme.aut.exhibitionexplorer.R;
+import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 
 /**
  * Created by Adam on 2016. 11. 18..
@@ -32,6 +37,7 @@ public class SearchBeaconFragment extends Fragment {
 
     private static final int REQUEST_ENABLE_BT = 104;
     public static final int PERMISSIONS_REQUEST_BLUETOOTH = 105;
+    public static final String TAG = "SearchBeaconFragment";
     private LinearLayout lySearchBeacon;
     private LinearLayout lyNeedBluetooth;
     private LinearLayout lyNotSupportedBluetoothLE;
@@ -41,6 +47,8 @@ public class SearchBeaconFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_search_beacon, container, false);
+
+        setHasOptionsMenu(true);
 
         lySearchBeacon = (LinearLayout) rootView.findViewById(R.id.lySearchBeacon);
         lyNeedBluetooth = (LinearLayout) rootView.findViewById(R.id.lyNeedBluetooth);
@@ -142,5 +150,16 @@ public class SearchBeaconFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String exhibitionUuID = sp.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
+        if (exhibitionUuID == null){
+            inflater.inflate(R.menu.explorer_with_no_exhibition_menu, menu);
+        } else {
+            inflater.inflate(R.menu.explorer_menu, menu);
+        }
 
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 }

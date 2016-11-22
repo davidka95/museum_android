@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hu.bme.aut.exhibitionexplorer.R;
+import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
 
@@ -27,6 +28,7 @@ import hu.bme.aut.exhibitionexplorer.fragment.ExhibitionFragment;
 
 public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.ExhibitionViewHolder> {
     private ArrayList<Exhibition> exhibitions;
+    private ArrayList<Exhibition> exhibitionsCopy;
     private Context context;
 
     ExhibitionFragment.OnItemClickListener onItemClickListener;
@@ -35,6 +37,7 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
         this.onItemClickListener = onItemClickListener;
         this.context = context;
         exhibitions = new ArrayList<>();
+        exhibitionsCopy = new ArrayList<>();
     }
 
     public ExhibitionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -44,7 +47,7 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
     public void onBindViewHolder(ExhibitionViewHolder holder, int position) {
         final Exhibition exhibition = exhibitions.get(position);
         Picasso.with(context).load(exhibition.getImageURL()).fit().centerCrop()
-                .placeholder(R.mipmap.ic_launcher).into(holder.iconImageView);
+                .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
         holder.nameTextView.setText(exhibition.getName());
         holder.descriptionTextView.setText(exhibition.getDescription());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -55,32 +58,13 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
         });
     }
 
-    private int getDemoIcons(int position) {
-        @DrawableRes int ret;
-        switch (position) {
-            case 0:
-                ret = R.drawable.exhibition_demo_icon_textura;
-                break;
-            case 1:
-                ret = R.drawable.exhibition_demo_icon_worldpress;
-                break;
-            case 2:
-                ret = R.drawable.exhibition_demo_icon_vadnyugat;
-                break;
-            default:
-                ret = R.drawable.exhibition_demo_icon_textura;
-                break;
-        }
-        return ret;
-    }
-
-
     public int getItemCount() {
         return exhibitions.size();
     }
 
     public void addExhibition(Exhibition exhibition) {
         exhibitions.add(exhibition);
+        exhibitionsCopy.add(exhibition);
     }
 
 
@@ -95,5 +79,20 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
             this.nameTextView = ((TextView) itemView.findViewById(R.id.ExhibitionNameTextView));
             this.descriptionTextView = ((TextView) itemView.findViewById(R.id.ExhibitionDescriptionTextView));
         }
+    }
+
+    public void filter(String text) {
+        exhibitions.clear();
+        if(text.isEmpty()){
+            exhibitions.addAll(exhibitionsCopy);
+        } else{
+            text = text.toLowerCase();
+            for(Exhibition exhibition: exhibitionsCopy){
+                if(exhibition.getName().toLowerCase().contains(text)){
+                    exhibitions.add(exhibition);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 }

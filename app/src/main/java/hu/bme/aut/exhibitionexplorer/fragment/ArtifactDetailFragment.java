@@ -125,7 +125,7 @@ public class ArtifactDetailFragment extends Fragment {
     private void loadDataToViews() {
         Log.d("a kiirando: ", artifact.getImageURL());
         Picasso.with(getContext()).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.mipmap.ic_launcher).into(ivArtifactImage);
+                .placeholder(R.drawable.loading_animation).into(ivArtifactImage);
 
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());

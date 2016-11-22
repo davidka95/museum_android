@@ -18,6 +18,9 @@ public class Exhibition implements Parcelable {
     public static final String KEY_EXHIBITION_PARCELABLE = "KEY_EXHIBITION_PARCELABLE";
 
     @Exclude
+    public static final String KEY_CHOOSED_EXHIBITION = "KEY_EXHIBITION_CHOOSED";
+
+    @Exclude
     private String UuID;
 
     @Exclude

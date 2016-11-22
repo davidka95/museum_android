@@ -72,8 +72,6 @@ public class MainActivity extends AppCompatActivity
     public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
     public static final String KEY_CHECKED_NAV_MENU_ID = "KEY_CHECKED_NAV_MENU_ID";
 
-    public static String KEY_CHOOSED_EXHIBITION = "KEY_CHOOSED_EXHIBITION";
-
     private String exhibitionUuID;
     private Exhibition exhibition = null;
     private HashMap<String, Boolean> artifactsHere;
@@ -112,7 +110,7 @@ public class MainActivity extends AppCompatActivity
 
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        exhibitionUuID = sp.getString(KEY_CHOOSED_EXHIBITION, null);
+        exhibitionUuID = sp.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
 
         if (mFirebaseUser == null) {
             loadLoginActivity();
@@ -257,8 +255,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_main_menu, menu);
         return super.onCreateOptionsMenu(menu);
 
     }
@@ -360,9 +356,10 @@ public class MainActivity extends AppCompatActivity
                 exhibition = data.getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
                 writeExhibitionUuIDToSharedPreferences(exhibition.getUuID());
                 artifactsHere = exhibition.getArtifactsHere();
+                actualArtifact = null;
+                nearestIBeacon = null;
+                showFragmentWithNoBackStack(new SearchBeaconFragment(), SearchBeaconFragment.TAG);
                 getArtifact();
-
-                onStart();
             } else if (requestCode == REQUEST_QR_READER) {
                 String artifactID = data.getStringExtra(Artifact.KEY_ARTIFACT_ID);
                 showExplorerFragmentByID(artifactID, true);
@@ -392,7 +389,7 @@ public class MainActivity extends AppCompatActivity
     private void writeExhibitionUuIDToSharedPreferences(String exhibitionUuID) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(KEY_CHOOSED_EXHIBITION, exhibition.getUuID());
+        editor.putString(Exhibition.KEY_CHOOSED_EXHIBITION, exhibition.getUuID());
         editor.commit();
     }
 
