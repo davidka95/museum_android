@@ -135,7 +135,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        beaconManager.bind(this);
+        if (exhibition != null) {
+            if (exhibition.isBeacon()) {
+                beaconManager.bind(this);
+            }
+        }
 
 
     }
@@ -143,9 +147,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        beaconManager.unbind(this);
-
-
+        if (exhibition != null) {
+            if (exhibition.isBeacon()) {
+                beaconManager.unbind(this);
+            }
+        }
     }
 
     private void getArtifact() {

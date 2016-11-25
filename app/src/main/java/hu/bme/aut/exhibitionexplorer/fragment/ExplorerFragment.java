@@ -109,12 +109,6 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
 
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());
-        quizHelper = new QuizHelper(artifact.getQuiz());
-        tvQuizQuestion.setText(quizHelper.getQuestionTitle());
-        btnAnswerA.setText(quizHelper.getQuestionA());
-        btnAnswerB.setText(quizHelper.getQuestionB());
-        btnAnswerC.setText(quizHelper.getQuestionC());
-        btnAnswerD.setText(quizHelper.getQuestionD());
     }
 
     private void initView(final View rootView) {
@@ -160,17 +154,42 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         tvArtifactName = (TextView) rootView.findViewById(R.id.tvArtifactName);
         tvArtifactDescription = (TextView) rootView.findViewById(R.id.tvArtifactDescription);
 
-        tvQuizQuestion = (TextView) rootView.findViewById(R.id.tvQuizQuestion);
-        btnAnswerA = (Button) rootView.findViewById(R.id.btnAnswerA);
-        btnAnswerA.setOnClickListener(this);
-        btnAnswerB = (Button) rootView.findViewById(R.id.btnAnswerB);
-        btnAnswerB.setOnClickListener(this);
-        btnAnswerC = (Button) rootView.findViewById(R.id.btnAnswerC);
-        btnAnswerC.setOnClickListener(this);
-        btnAnswerD = (Button) rootView.findViewById(R.id.btnAnswerD);
-        btnAnswerD.setOnClickListener(this);
+        initQuestion(rootView);
 
         loadDataToViews();
+    }
+
+    private void initQuestion(View rootView) {
+        tvQuizQuestion = (TextView) rootView.findViewById(R.id.tvQuizQuestion);
+        btnAnswerA = (Button) rootView.findViewById(R.id.btnAnswerA);
+        btnAnswerB = (Button) rootView.findViewById(R.id.btnAnswerB);
+        btnAnswerC = (Button) rootView.findViewById(R.id.btnAnswerC);
+        btnAnswerD = (Button) rootView.findViewById(R.id.btnAnswerD);
+
+        if (!artifact.getQuiz().equals("-")) {
+            btnAnswerA.setOnClickListener(this);
+            btnAnswerB.setOnClickListener(this);
+            btnAnswerC.setOnClickListener(this);
+            btnAnswerD.setOnClickListener(this);
+
+            loadDataToQuestionView();
+        } else {
+            tvQuizQuestion.setVisibility(View.GONE);
+            btnAnswerA.setVisibility(View.GONE);
+            btnAnswerB.setVisibility(View.GONE);
+            btnAnswerC.setVisibility(View.GONE);
+            btnAnswerD.setVisibility(View.GONE);
+
+        }
+    }
+
+    private void loadDataToQuestionView() {
+        quizHelper = new QuizHelper(artifact.getQuiz());
+        tvQuizQuestion.setText(quizHelper.getQuestionTitle());
+        btnAnswerA.setText(quizHelper.getQuestionA());
+        btnAnswerB.setText(quizHelper.getQuestionB());
+        btnAnswerC.setText(quizHelper.getQuestionC());
+        btnAnswerD.setText(quizHelper.getQuestionD());
     }
 
     private void setFabButton() {
