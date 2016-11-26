@@ -1,5 +1,7 @@
 package hu.bme.aut.exhibitionexplorer.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -72,7 +75,7 @@ public class ExhibitionDetailFragment extends Fragment {
     private TextView tvQuiz;
     private TextView tvDescription;
 
-    private ImageView ivCompass;
+    private TextView tvShowMap;
 
     private MapView mapView;
     private GoogleMap map;
@@ -113,13 +116,12 @@ public class ExhibitionDetailFragment extends Fragment {
             }
         });
 
-        ivCompass = (ImageView) rootView.findViewById(R.id.ivCompass);
-        ivCompass.setOnClickListener(new View.OnClickListener() {
+        tvShowMap = (TextView) rootView.findViewById(R.id.tvShowMap);
+        tvShowMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mapView.getVisibility() == View.VISIBLE){
-                    mapView.setVisibility(View.GONE);
-                } else {
+                if (mapView.getVisibility() != View.VISIBLE){
+                    tvShowMap.setVisibility(View.GONE);
                     mapView.setVisibility(View.VISIBLE);
                 }
             }
@@ -207,8 +209,6 @@ public class ExhibitionDetailFragment extends Fragment {
                     });
                     Marker marker = map.addMarker(markerOptions);
                     marker.showInfoWindow();
-                    map.getUiSettings().setMyLocationButtonEnabled(false);
-                    map.setMyLocationEnabled(true);
 
                     MapsInitializer.initialize(getActivity());
 

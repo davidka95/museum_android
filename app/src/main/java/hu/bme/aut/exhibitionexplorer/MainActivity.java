@@ -21,12 +21,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +42,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -45,8 +54,13 @@ import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.BeaconData;
@@ -71,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     public static final String KEY_NEAREST_BEACON = "KEY_NEAREST_BEACON";
     public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
     public static final String KEY_CHECKED_NAV_MENU_ID = "KEY_CHECKED_NAV_MENU_ID";
+    public static final int MIN_RSSI = -55;
 
     private String exhibitionUuID;
     private Exhibition exhibition = null;
@@ -83,12 +98,20 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private int checkedNavMenuID = R.id.nav_explore;
 
+    private Boolean isAutomaticallyShowBeacon;
     private String nearestIBeacon = null;
     private Artifact actualArtifact = null;
 
     private BeaconManager beaconManager;
 
     private Toolbar toolbar;
+
+    private Button btnNextArtifact;
+    private TextView tvNextArtifactName;
+    private ImageView ivNextArtifact;
+    private CardView nextArtifactLayout;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,13 +127,27 @@ public class MainActivity extends AppCompatActivity
             checkedNavMenuID = savedInstanceState.getInt(KEY_CHECKED_NAV_MENU_ID);
         }
 
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initNavigationDrawer();
+        initNextArtifactLayout();
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        exhibitionUuID = sp.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
+        prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+
+                if (key.equals(getString(R.string.key_pref_ibeacon))) {
+                    isAutomaticallyShowBeacon = prefs.getBoolean(key, true);
+                }
+
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
+        isAutomaticallyShowBeacon = prefs.getBoolean((getString(R.string.key_pref_ibeacon)), true);
+        exhibitionUuID = prefs.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
 
         if (mFirebaseUser == null) {
             loadLoginActivity();
@@ -131,6 +168,13 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void initNextArtifactLayout() {
+        nextArtifactLayout = (CardView) findViewById(R.id.nextArtifactLayout);
+        ivNextArtifact = (ImageView) findViewById(R.id.ivNextArtifact);
+        tvNextArtifactName = (TextView) findViewById(R.id.tvNextArtifactName);
+        btnNextArtifact = (Button) findViewById(R.id.btnNextArtifact);
+    }
+
 
     @Override
     protected void onStart() {
@@ -140,8 +184,6 @@ public class MainActivity extends AppCompatActivity
                 beaconManager.bind(this);
             }
         }
-
-
     }
 
     @Override
@@ -225,7 +267,8 @@ public class MainActivity extends AppCompatActivity
             setNavigationViewTitle(R.id.nav_favorite);
             showFragmentWithNoBackStack(new FavoriteFragment(), FavoriteFragment.TAG);
         } else if (id == R.id.nav_settings) {
-
+            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(settingsIntent);
         } else if (id == R.id.nav_help_and_feedbeck) {
 
         } else if (id == R.id.nav_sign_out) {
@@ -375,21 +418,29 @@ public class MainActivity extends AppCompatActivity
 
     public void showExplorerFragmentByID(String artifactID, boolean withAnimation) {
         Bundle bundle = new Bundle();
-        for (Artifact artifact : artifacts) {
-            if (artifact.getUuID().equals(artifactID)) {
-                bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-                actualArtifact = artifact;
-                Fragment explorerFragment = new ExplorerFragment();
-                explorerFragment.setArguments(bundle);
-                if (withAnimation) {
-                    showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
-                } else {
-                    showFragmentWithNoBackStack(explorerFragment, ExplorerFragment.TAG);
-                }
-
-                break;
+        getArtifactByID(artifactID);
+        Artifact artifact = getArtifactByID(artifactID);
+        if (artifact != null) {
+            bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+            actualArtifact = artifact;
+            Fragment explorerFragment = new ExplorerFragment();
+            explorerFragment.setArguments(bundle);
+            if (withAnimation) {
+                showFragmentWithAnimation(explorerFragment, ExplorerFragment.TAG);
+            } else {
+                showFragmentWithNoBackStack(explorerFragment, ExplorerFragment.TAG);
             }
         }
+    }
+
+    private Artifact getArtifactByID(String artifactID) {
+        for (Artifact artifact : artifacts) {
+            if (artifact.getUuID().equals(artifactID)) {
+                return artifact;
+            }
+        }
+
+        return null;
     }
 
     private void writeExhibitionUuIDToSharedPreferences(String exhibitionUuID) {
@@ -424,7 +475,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0 && exhibition != null && checkedNavMenuID == R.id.nav_explore) {
-                    manageBeacon(beacons.iterator().next());
+                    ArrayList<Beacon> arrayBeacons = new ArrayList<Beacon>(beacons);
+                    Collections.sort(arrayBeacons, new Comparator<Beacon>() {
+                        @Override
+                        public int compare(Beacon b1, Beacon b2) {
+                            return b2.getRssi() - b1.getRssi();
+                        }
+                    });
+
+                    for (Beacon beacon : arrayBeacons) {
+                        if (beacon.getRssi() > MIN_RSSI)
+                        manageBeacon(beacon);
+                    }
                 }
             }
         });
@@ -446,11 +508,16 @@ public class MainActivity extends AppCompatActivity
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            BeaconData beaconData;
+                            final BeaconData beaconData;
                             beaconData = dataSnapshot.getValue(BeaconData.class);
                             beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
                             if (beaconData != null) {
-                                showExplorerFragmentByID(beaconData.getArtifactId(), true);
+                                if (isAutomaticallyShowBeacon) {
+                                    showExplorerFragmentByID(beaconData.getArtifactId(), true);
+                                } else {
+                                    loadNextArtifactViewData(beaconData.getArtifactId());
+                                }
+
                             }
 
                         }
@@ -463,6 +530,23 @@ public class MainActivity extends AppCompatActivity
         }
 
         Log.d(BEACON_TAG, "manageBeacon: " + beacon.getId1() + " ID");
+
+    }
+
+    private void loadNextArtifactViewData(final String artifactId) {
+        Artifact artifact = getArtifactByID(artifactId);
+        if (artifact != null) {
+            Picasso.with(this).load(artifact.getImageURL()).into(ivNextArtifact);
+            tvNextArtifactName.setText(artifact.getName());
+            btnNextArtifact.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExplorerFragmentByID(artifactId, true);
+                    nextArtifactLayout.setVisibility(View.GONE);
+                }
+            });
+            nextArtifactLayout.setVisibility(View.VISIBLE);
+        }
 
     }
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="IBeacon Settings">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_pref_ibeacon"
+            android:title="Show artifact automatically" />
+    </PreferenceCategory>
+</PreferenceScreen>

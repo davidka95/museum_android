@@ -70,30 +70,34 @@
                         android:layout_height="wrap_content"
                         tools:text="Date 2014.05.03-2015" />
 
-                    <RelativeLayout
+                    <TextView
+                        android:id="@+id/tvLocation"
+                        style="@style/Base.TextAppearance.AppCompat.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        tools:text="1146 Budapest, Dózsa György út 41." />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
                         <TextView
-                            android:id="@+id/tvLocation"
-                            style="@style/Base.TextAppearance.AppCompat.Small"
-                            android:layout_centerVertical="true"
+                            android:id="@+id/tvShowMap"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="1146 Budapest, Dózsa György út 41." />
+                            android:layout_gravity="center"
+                            android:text="@string/show_map_text"
+                            android:textColor="@color/accent" />
 
-                        <ImageView android:id="@+id/ivCompass"
-                            android:src="@drawable/ic_action_compass"
-                            android:layout_alignParentRight="true"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </RelativeLayout>
+                        <com.google.android.gms.maps.MapView
+                            android:id="@+id/mapView"
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp"
+                            android:visibility="gone" />
 
-
-                    <com.google.android.gms.maps.MapView
-                        android:visibility="gone"
-                        android:id="@+id/mapView"
-                        android:layout_width="match_parent"
-                        android:layout_height="250dp" />
+                    </LinearLayout>
 
 
                 </LinearLayout>
