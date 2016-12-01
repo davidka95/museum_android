@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.zip.Inflater;
 
+import hu.bme.aut.exhibitionexplorer.PicassoCache;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 
@@ -140,8 +141,7 @@ public class ExhibitionDetailFragment extends Fragment {
     }
 
     private void loadDataToViews() {
-        Picasso.with(getContext()).load(exhibition.getImageURL()).fit().centerCrop()
-                .placeholder(R.drawable.loading_animation).into(ivExhibitionImage);
+        PicassoCache.makeImageRequest(getContext(), ivExhibitionImage, exhibition.getImageURL());
 
         FirebaseDatabase.getInstance().getReference("museums").child(String.valueOf(exhibition.getInMuseum()))
                 .child("address").addValueEventListener(new ValueEventListener() {

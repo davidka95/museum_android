@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.bme.aut.exhibitionexplorer.PicassoCache;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
@@ -46,8 +47,7 @@ public class ExhibitionAdapter extends RecyclerView.Adapter<ExhibitionAdapter.Ex
 
     public void onBindViewHolder(ExhibitionViewHolder holder, int position) {
         final Exhibition exhibition = exhibitions.get(position);
-        Picasso.with(context).load(exhibition.getImageURL()).fit().centerCrop()
-                .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
+        PicassoCache.makeImageRequest(context, holder.iconImageView, exhibition.getImageURL());
         holder.nameTextView.setText(exhibition.getName());
         holder.descriptionTextView.setText(exhibition.getDescription());
         holder.itemView.setOnClickListener(new View.OnClickListener() {

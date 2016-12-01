@@ -28,11 +28,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.altbeacon.beacon.Beacon;
@@ -43,8 +46,10 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import hu.bme.aut.exhibitionexplorer.ArtifactActivity;
+import hu.bme.aut.exhibitionexplorer.PicassoCache;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.adapter.CatalogAdapter;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
@@ -60,7 +65,7 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
 
     public static String TAG = "ExplorerFragment";
 
-    DatabaseReference mArtifactsReference;
+    private DatabaseReference mArtifactsReference;
 
     private KenBurnsView ivArtifactImage;
     private TextView tvArtifactName;
@@ -73,9 +78,14 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
     private Button btnAnswerD;
 
     private QuizHelper quizHelper;
-    Artifact artifact;
+    private Artifact artifact;
+    private Boolean userStatistics;
+    private Boolean haveUserStatistics = false;
+
+    private FirebaseUser firebaseUser;
 
     private OnFavoriteListener onFavoriteAddedListener;
+    private OnAnswerClickListener onAnswerClickListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +93,12 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         FragmentActivity activity = getActivity();
         if (activity instanceof OnFavoriteListener) {
             onFavoriteAddedListener = (OnFavoriteListener) activity;
+        } else {
+            throw new RuntimeException("Activity(" + activity.toString() + ") must implement OnFavoriteListener interface");
+        }
+
+        if (activity instanceof OnAnswerClickListener) {
+            onAnswerClickListener = (OnAnswerClickListener) activity;
         } else {
             throw new RuntimeException("Activity(" + activity.toString() + ") must implement OnFavoriteListener interface");
         }
@@ -95,6 +111,13 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_explorer, container, false);
 
         artifact = getArguments().getParcelable(Artifact.KEY_ARTIFACT_PARCELABLE);
+        final String KEY_USER_STATISTICS = getString(R.string.key_user_statistics);
+        if (getArguments().containsKey(KEY_USER_STATISTICS)){
+            haveUserStatistics = true;
+            userStatistics = getArguments().getBoolean(KEY_USER_STATISTICS);
+        }
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         setHasOptionsMenu(true);
 
@@ -105,9 +128,8 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
 
     private void loadDataToViews() {
         Log.d("a kiirando: ", artifact.getImageURL());
-        Picasso.with(getContext()).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.drawable.loading_animation).into(ivArtifactImage);
 
+        PicassoCache.makeImageRequest(getContext(), ivArtifactImage, artifact.getImageURL());
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());
     }
@@ -168,20 +190,40 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         btnAnswerD = (Button) rootView.findViewById(R.id.btnAnswerD);
 
         if (!artifact.getQuiz().equals("-")) {
-            btnAnswerA.setOnClickListener(this);
-            btnAnswerB.setOnClickListener(this);
-            btnAnswerC.setOnClickListener(this);
-            btnAnswerD.setOnClickListener(this);
-
             loadDataToQuestionView();
+            if (haveUserStatistics){
+                showTheCorrectAnswer();
+            } else {
+                btnAnswerA.setOnClickListener(this);
+                btnAnswerB.setOnClickListener(this);
+                btnAnswerC.setOnClickListener(this);
+                btnAnswerD.setOnClickListener(this);
+            }
         } else {
-            tvQuizQuestion.setVisibility(View.GONE);
-            btnAnswerA.setVisibility(View.GONE);
-            btnAnswerB.setVisibility(View.GONE);
-            btnAnswerC.setVisibility(View.GONE);
-            btnAnswerD.setVisibility(View.GONE);
+            hideQuestionLayout();
 
         }
+    }
+
+    private void showTheCorrectAnswer() {
+        int correctAnswerID = quizHelper.getCorrectAnswerID();
+        if (correctAnswerID == QuizHelper.ANSWER_A) {
+            btnAnswerA.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+        } else if (correctAnswerID == QuizHelper.ANSWER_B) {
+            btnAnswerB.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+        } else if (correctAnswerID == QuizHelper.ANSWER_C) {
+            btnAnswerC.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+        } else if (correctAnswerID == QuizHelper.ANSWER_D) {
+            btnAnswerD.setBackgroundColor(getResources().getColor(R.color.correct_answer));
+        }
+    }
+
+    private void hideQuestionLayout() {
+        tvQuizQuestion.setVisibility(View.GONE);
+        btnAnswerA.setVisibility(View.GONE);
+        btnAnswerB.setVisibility(View.GONE);
+        btnAnswerC.setVisibility(View.GONE);
+        btnAnswerD.setVisibility(View.GONE);
     }
 
     private void loadDataToQuestionView() {
@@ -213,6 +255,10 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
         boolean correctAnswer = false;
         correctAnswer = isCorrectAnswer(id);
         setAnswerViewColor(correctAnswer, v);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(artifact.getUuID(), correctAnswer);
+        FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).updateChildren(hashMap);
+        onAnswerClickListener.onAnswerClick(artifact.getUuID(), correctAnswer);
     }
 
     private boolean isCorrectAnswer(int id) {
@@ -242,18 +288,7 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
             btnAnswerA.setClickable(false);
         } else {
             v.setBackgroundColor(getResources().getColor(R.color.in_correct_answer));
-            int correctAnswerID = quizHelper.getCorrectAnswerID();
-            if (correctAnswerID == QuizHelper.ANSWER_A) {
-                btnAnswerA.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            } else if (correctAnswerID == QuizHelper.ANSWER_B) {
-                btnAnswerB.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            } else if (correctAnswerID == QuizHelper.ANSWER_C) {
-                btnAnswerC.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            } else if (correctAnswerID == QuizHelper.ANSWER_D) {
-                btnAnswerD.setBackgroundColor(getResources().getColor(R.color.correct_answer));
-            }
-
-
+            showTheCorrectAnswer();
         }
         setUnClickableButton();
 
@@ -270,5 +305,9 @@ public class ExplorerFragment extends Fragment implements View.OnClickListener {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.explorer_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public interface OnAnswerClickListener{
+        public void onAnswerClick(String artifactUuID, boolean answer);
     }
 }

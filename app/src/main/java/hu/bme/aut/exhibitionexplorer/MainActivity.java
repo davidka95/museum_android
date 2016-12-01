@@ -1,8 +1,6 @@
 package hu.bme.aut.exhibitionexplorer;
 
-import android.*;
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -22,18 +20,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,10 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.BeaconData;
@@ -76,7 +66,7 @@ import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener {
+        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener, ExplorerFragment.OnAnswerClickListener {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
@@ -91,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     private Exhibition exhibition = null;
     private HashMap<String, Boolean> artifactsHere;
     private ArrayList<Artifact> artifacts = new ArrayList<>();
+    private HashMap<String, Boolean> userStatistics;
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -153,11 +144,7 @@ public class MainActivity extends AppCompatActivity
             loadLoginActivity();
         }
 
-        exhibition = getIntent().getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
-        if (exhibition != null) {
-            artifactsHere = exhibition.getArtifactsHere();
-        }
-
+        getExtraData();
         getArtifact();
 
 
@@ -166,6 +153,15 @@ public class MainActivity extends AppCompatActivity
                 setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
 
+    }
+
+    private void getExtraData() {
+        exhibition = getIntent().getParcelableExtra(Exhibition.KEY_EXHIBITION_PARCELABLE);
+        if (exhibition != null) {
+            artifactsHere = exhibition.getArtifactsHere();
+
+        }
+        userStatistics = (HashMap<String, Boolean>) getIntent().getSerializableExtra(getString(R.string.key_user_statistics));
     }
 
     private void initNextArtifactLayout() {
@@ -244,7 +240,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_explore) {
             setNavigationViewTitle(R.id.nav_explore);
             if (exhibition != null) {
-                if (nearestIBeacon == null) {
+                if (nearestIBeacon == null &&actualArtifact == null) {
                     showFragmentWithNoBackStack(new SearchBeaconFragment(), null);
                 } else if (actualArtifact != null) {
                     showExplorerFragmentByID(actualArtifact.getUuID(), false);
@@ -422,6 +418,9 @@ public class MainActivity extends AppCompatActivity
         Artifact artifact = getArtifactByID(artifactID);
         if (artifact != null) {
             bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
+            if(userStatistics!=null && userStatistics.containsKey(artifactID)){
+                bundle.putBoolean(getString(R.string.key_user_statistics), userStatistics.get(artifactID));
+            }
             actualArtifact = artifact;
             Fragment explorerFragment = new ExplorerFragment();
             explorerFragment.setArguments(bundle);
@@ -558,6 +557,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void ArtifactRemovedFromFavorite(Artifact artifact) {
         artifact.delete();
+    }
+
+    @Override
+    public void onAnswerClick(String artifactUuID, boolean answer) {
+        if (userStatistics == null){
+            userStatistics = new HashMap<>();
+        }
+        userStatistics.put(artifactUuID, answer);
     }
 
     class LoadArtifactHelper extends AsyncTask<DataSnapshot, Void, Void> {

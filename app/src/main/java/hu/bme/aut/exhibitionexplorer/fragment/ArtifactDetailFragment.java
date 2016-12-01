@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.squareup.picasso.Picasso;
 
+import hu.bme.aut.exhibitionexplorer.PicassoCache;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
@@ -124,8 +125,7 @@ public class ArtifactDetailFragment extends Fragment {
 
     private void loadDataToViews() {
         Log.d("a kiirando: ", artifact.getImageURL());
-        Picasso.with(getContext()).load(artifact.getImageURL()).fit().centerCrop()
-                .placeholder(R.drawable.loading_animation).into(ivArtifactImage);
+        PicassoCache.makeImageRequest(getContext(), ivArtifactImage, artifact.getImageURL());
 
         tvArtifactName.setText(artifact.getName());
         tvArtifactDescription.setText(artifact.getDescription());

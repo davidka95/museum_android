@@ -133,4 +133,5 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="settings_title">Settings</string>
     <string name="key_pref_ibeacon">prefIBeacon</string>
+    <string name="key_user_statistics">KEY_USER_STATISTICS</string>
 </resources>

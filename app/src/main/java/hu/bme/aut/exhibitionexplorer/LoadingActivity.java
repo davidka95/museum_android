@@ -15,13 +15,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
 
 
 public class LoadingActivity extends AppCompatActivity {
-    String exhibitionUuID;
+    private String exhibitionUuID;
 
-    Exhibition exhibition = null;
+    private Exhibition exhibition = null;
+    private HashMap<String, Boolean> userStatistics;
+    private boolean isUserStatistics = false;
+    private boolean isExhibition = false;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -41,6 +47,7 @@ public class LoadingActivity extends AppCompatActivity {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         exhibitionUuID = sp.getString(Exhibition.KEY_CHOOSED_EXHIBITION, null);
         getExhibition();
+        getUserStatistics();
     }
 
     private void getExhibition() {
@@ -51,6 +58,7 @@ public class LoadingActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     exhibition = dataSnapshot.getValue(Exhibition.class);
+                    isExhibition = true;
                     startMainActivity();
                 }
 
@@ -60,16 +68,41 @@ public class LoadingActivity extends AppCompatActivity {
                 }
             });
         } else {
+            isExhibition = true;
             startMainActivity();
         }
     }
 
+    private void getUserStatistics() {
+        userStatistics = new HashMap<>();
+        DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid());
+        dbReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data: dataSnapshot.getChildren()){
+                    userStatistics.put(data.getKey(), data.getValue(Boolean.class));
+                }
+                isUserStatistics = true;
+                startMainActivity();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                isUserStatistics = true;
+                startMainActivity();
+            }
+        });
+    }
+
     public void startMainActivity(){
-        Intent mainActivity = new Intent(this, MainActivity.class);
-        mainActivity.putExtra(Exhibition.KEY_EXHIBITION_PARCELABLE, exhibition);
-        mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainActivity);
+        if (isExhibition && isUserStatistics){
+            Intent mainActivity = new Intent(this, MainActivity.class);
+            mainActivity.putExtra(Exhibition.KEY_EXHIBITION_PARCELABLE, exhibition);
+            mainActivity.putExtra(getString(R.string.key_user_statistics), userStatistics);
+            mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(mainActivity);
+        }
     }
 
     private void loadLoginActivity() {

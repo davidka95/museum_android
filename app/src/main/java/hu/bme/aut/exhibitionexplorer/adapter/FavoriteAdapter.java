@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.bme.aut.exhibitionexplorer.PicassoCache;
 import hu.bme.aut.exhibitionexplorer.R;
 import hu.bme.aut.exhibitionexplorer.data.Artifact;
 import hu.bme.aut.exhibitionexplorer.data.Exhibition;
@@ -49,13 +50,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
     @Override
     public void onBindViewHolder(FavoriteViewHolder holder, int position) {
         final Artifact artifact = favorites.get(position);
-        try {
-            Picasso.with(context).load(artifact.getImageURL()).fit().centerCrop()
-                    .placeholder(R.drawable.loading_animation).into(holder.iconImageView);
-        } catch (Exception e) {
-            Picasso.with(context).load(R.drawable.no_image_found).into(holder.iconImageView);
-        }
-
+        PicassoCache.makeImageRequest(context, holder.iconImageView, artifact.getImageURL());
         holder.nameTextView.setText(artifact.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
