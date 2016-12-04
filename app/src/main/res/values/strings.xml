@@ -134,4 +134,12 @@
     <string name="settings_title">Settings</string>
     <string name="key_pref_ibeacon">prefIBeacon</string>
     <string name="key_user_statistics">KEY_USER_STATISTICS</string>
+    <string name="saved_items">Saved Items</string>
+    <string name="trivia_progress">Trivia progress</string>
+    <string name="trivia_status_value">%1$d/%2$d</string>
+    <string name="clear_result">Clear results</string>
+    <string name="user_statistics">Statistics</string>
+    <string name="user_information">User information</string>
+    <string name="log_out">Log Out</string>
+    <string name="profile">Profile</string>
 </resources>

@@ -59,14 +59,16 @@ import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
+import hu.bme.aut.exhibitionexplorer.fragment.ProfileFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.SearchBeaconFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
+import hu.bme.aut.exhibitionexplorer.interfaces.QuizHistoryDeletedListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener, ExplorerFragment.OnAnswerClickListener {
+        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener, ExplorerFragment.OnAnswerClickListener,QuizHistoryDeletedListener {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
@@ -75,7 +77,10 @@ public class MainActivity extends AppCompatActivity
     public static final String KEY_NEAREST_BEACON = "KEY_NEAREST_BEACON";
     public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
     public static final String KEY_CHECKED_NAV_MENU_ID = "KEY_CHECKED_NAV_MENU_ID";
+    public static final String KEY_USER_STATISTICS = "KEY_USER_STATISTICS";
     public static final int MIN_RSSI = -55;
+    public static final String KEY_USER_EMAIL = "KEY_USER_EMAIL";
+    public static final String KEY_USER_ID = "KEY_USER_ID";
 
     private String exhibitionUuID;
     private Exhibition exhibition = null;
@@ -240,7 +245,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_explore) {
             setNavigationViewTitle(R.id.nav_explore);
             if (exhibition != null) {
-                if (nearestIBeacon == null &&actualArtifact == null) {
+                if (nearestIBeacon == null && actualArtifact == null) {
                     showFragmentWithNoBackStack(new SearchBeaconFragment(), null);
                 } else if (actualArtifact != null) {
                     showExplorerFragmentByID(actualArtifact.getUuID(), false);
@@ -259,6 +264,19 @@ public class MainActivity extends AppCompatActivity
             } else {
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
+        } else if (id == R.id.nav_profile) {
+            setNavigationViewTitle(R.id.nav_profile);
+            Bundle bundle = new Bundle();
+            String email = mFirebaseUser.getEmail();
+            String uid = mFirebaseUser.getUid();
+            Log.d("Uid: ", uid);
+            bundle.putString(KEY_USER_ID, uid);
+            bundle.putString(KEY_USER_EMAIL, email);
+            bundle.putSerializable(KEY_USER_STATISTICS, userStatistics);
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(bundle);
+            showFragmentWithNoBackStack(profileFragment, ProfileFragment.TAG);
+
         } else if (id == R.id.nav_favorite) {
             setNavigationViewTitle(R.id.nav_favorite);
             showFragmentWithNoBackStack(new FavoriteFragment(), FavoriteFragment.TAG);
@@ -418,7 +436,7 @@ public class MainActivity extends AppCompatActivity
         Artifact artifact = getArtifactByID(artifactID);
         if (artifact != null) {
             bundle.putParcelable(Artifact.KEY_ARTIFACT_PARCELABLE, artifact);
-            if(userStatistics!=null && userStatistics.containsKey(artifactID)){
+            if (userStatistics != null && userStatistics.containsKey(artifactID)) {
                 bundle.putBoolean(getString(R.string.key_user_statistics), userStatistics.get(artifactID));
             }
             actualArtifact = artifact;
@@ -484,7 +502,7 @@ public class MainActivity extends AppCompatActivity
 
                     for (Beacon beacon : arrayBeacons) {
                         if (beacon.getRssi() > MIN_RSSI)
-                        manageBeacon(beacon);
+                            manageBeacon(beacon);
                     }
                 }
             }
@@ -561,10 +579,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onAnswerClick(String artifactUuID, boolean answer) {
-        if (userStatistics == null){
+        if (userStatistics == null) {
             userStatistics = new HashMap<>();
         }
         userStatistics.put(artifactUuID, answer);
+    }
+
+    @Override
+    public void updateUserStatistics() {
+        userStatistics.clear();
     }
 
     class LoadArtifactHelper extends AsyncTask<DataSnapshot, Void, Void> {
