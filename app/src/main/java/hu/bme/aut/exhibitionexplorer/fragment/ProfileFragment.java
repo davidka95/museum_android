@@ -81,7 +81,7 @@ public class ProfileFragment extends Fragment {
                                 tvTrivia.setText(String.format(getResources().getString(R.string.trivia_status_value), answerGood, answerAll));
                             }
                         })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // do nothing
                             }
