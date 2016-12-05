@@ -62,6 +62,9 @@
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filer>
         </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="DATABASE"

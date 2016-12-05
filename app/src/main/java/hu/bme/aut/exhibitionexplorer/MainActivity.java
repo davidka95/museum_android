@@ -59,16 +59,14 @@ import hu.bme.aut.exhibitionexplorer.fragment.CatalogFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.ExplorerFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.FavoriteFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.NullExhibitionFragment;
-import hu.bme.aut.exhibitionexplorer.fragment.ProfileFragment;
 import hu.bme.aut.exhibitionexplorer.fragment.SearchBeaconFragment;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnArtifactItemClickListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnFavoriteListener;
 import hu.bme.aut.exhibitionexplorer.interfaces.OnSearchExhibitionClickListener;
-import hu.bme.aut.exhibitionexplorer.interfaces.QuizHistoryDeletedListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnSearchExhibitionClickListener,
-        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener, ExplorerFragment.OnAnswerClickListener,QuizHistoryDeletedListener {
+        OnArtifactItemClickListener, BeaconConsumer, OnFavoriteListener, ExplorerFragment.OnAnswerClickListener {
 
     public static final int REQUEST_EXHIBITION = 102;
     public static final int REQUEST_QR_READER = 103;
@@ -81,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     public static final int MIN_RSSI = -55;
     public static final String KEY_USER_EMAIL = "KEY_USER_EMAIL";
     public static final String KEY_USER_ID = "KEY_USER_ID";
+    public static final int REQUEST_PROFILE = 104;
 
     private String exhibitionUuID;
     private Exhibition exhibition = null;
@@ -265,17 +264,15 @@ public class MainActivity extends AppCompatActivity
                 showFragmentWithNoBackStack(new NullExhibitionFragment(), NullExhibitionFragment.TAG);
             }
         } else if (id == R.id.nav_profile) {
-            setNavigationViewTitle(R.id.nav_profile);
             Bundle bundle = new Bundle();
             String email = mFirebaseUser.getEmail();
             String uid = mFirebaseUser.getUid();
             Log.d("Uid: ", uid);
-            bundle.putString(KEY_USER_ID, uid);
-            bundle.putString(KEY_USER_EMAIL, email);
-            bundle.putSerializable(KEY_USER_STATISTICS, userStatistics);
-            ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setArguments(bundle);
-            showFragmentWithNoBackStack(profileFragment, ProfileFragment.TAG);
+            Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+            profileIntent.putExtra(KEY_USER_ID, uid);
+            profileIntent.putExtra(KEY_USER_EMAIL, email);
+            profileIntent.putExtra(KEY_USER_STATISTICS, userStatistics);
+            startActivityForResult(profileIntent, REQUEST_PROFILE);
 
         } else if (id == R.id.nav_favorite) {
             setNavigationViewTitle(R.id.nav_favorite);
@@ -426,6 +423,10 @@ public class MainActivity extends AppCompatActivity
             } else if (requestCode == REQUEST_QR_READER) {
                 String artifactID = data.getStringExtra(Artifact.KEY_ARTIFACT_ID);
                 showExplorerFragmentByID(artifactID, true);
+            } else if (requestCode == REQUEST_PROFILE) {
+                Bundle res = data.getExtras();
+                boolean deleted = res.getBoolean(ProfileActivity.KEY_HISTORY_DELETED);
+                if(deleted) updateUserStatistics();
             }
         }
     }
@@ -585,9 +586,12 @@ public class MainActivity extends AppCompatActivity
         userStatistics.put(artifactUuID, answer);
     }
 
-    @Override
+
     public void updateUserStatistics() {
         userStatistics.clear();
+        if (actualArtifact != null) {
+            showExplorerFragmentByID(actualArtifact.getUuID(), false);
+        }
     }
 
     class LoadArtifactHelper extends AsyncTask<DataSnapshot, Void, Void> {
