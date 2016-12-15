@@ -21,8 +21,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import org.altbeacon.beacon.BeaconManager;
 
@@ -38,10 +42,11 @@ public class SearchBeaconFragment extends Fragment {
     private static final int REQUEST_ENABLE_BT = 104;
     public static final int PERMISSIONS_REQUEST_BLUETOOTH = 105;
     public static final String TAG = "SearchBeaconFragment";
-    private LinearLayout lySearchBeacon;
+    private RelativeLayout lySearchBeacon;
     private LinearLayout lyNeedBluetooth;
     private LinearLayout lyNotSupportedBluetoothLE;
     private Button btnBluetoothTurnOn;
+    private ImageView ivBeaconIcon;
 
     @Nullable
     @Override
@@ -50,7 +55,7 @@ public class SearchBeaconFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        lySearchBeacon = (LinearLayout) rootView.findViewById(R.id.lySearchBeacon);
+        lySearchBeacon = (RelativeLayout) rootView.findViewById(R.id.lySearchBeacon);
         lyNeedBluetooth = (LinearLayout) rootView.findViewById(R.id.lyNeedBluetooth);
         lyNotSupportedBluetoothLE = (LinearLayout) rootView.findViewById(R.id.lyNotSupportedBluetooth);
         btnBluetoothTurnOn = (Button) rootView.findViewById(R.id.btnBluetoothTurnOn);
@@ -62,6 +67,7 @@ public class SearchBeaconFragment extends Fragment {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         });
+        ivBeaconIcon = (ImageView) rootView.findViewById(R.id.ivBeaconSearch);
 
         verifyBluetooth();
 
@@ -128,6 +134,8 @@ public class SearchBeaconFragment extends Fragment {
             } else {
                 lyNotSupportedBluetoothLE.setVisibility(LinearLayout.INVISIBLE);
                 lySearchBeacon.setVisibility(LinearLayout.VISIBLE);
+                Animation myFadeInAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.beacon_icon_flash_fade);
+                ivBeaconIcon.startAnimation(myFadeInAnimation);
                 lyNeedBluetooth.setVisibility(LinearLayout.INVISIBLE);
             }
         } catch (RuntimeException e) {

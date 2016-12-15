@@ -5,30 +5,51 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/lySearchBeacon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:gravity="center"
         android:orientation="vertical"
-        android:visibility="invisible">
+        android:visibility="visible">
 
-        <TextView
+
+        <TextView android:id="@+id/beaconSearchText"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Search artifacts nearby" />
+            android:text="@string/looking_for_ibeacons" />
+
+        <TextView android:text="@string/search_beacon_information_text"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content" />
 
         <com.github.rahatarmanahmed.cpv.CircularProgressView
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/beaconSearchText"
             android:id="@+id/progress_view"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:cpv_animAutostart="true"
             app:cpv_indeterminate="true" />
 
+        <ImageView
+            android:id="@+id/ivBeaconSearch"
+            android:layout_marginBottom="30dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/ibeacon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
     <LinearLayout
@@ -51,7 +72,7 @@
             android:id="@+id/btnBluetoothTurnOn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Turn On" />
+            android:text="@string/button_turn_on" />
     </LinearLayout>
 
     <LinearLayout

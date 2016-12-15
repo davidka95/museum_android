@@ -24,6 +24,7 @@
             android:scaleType="centerCrop" />
 
         <TextView
+            android:gravity="center"
             android:id="@+id/FavoriteNameTextView"
             android:layout_width="0.0dp"
             android:layout_height="match_parent"

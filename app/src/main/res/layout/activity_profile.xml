@@ -111,7 +111,7 @@
                     android:layout_margin="9sp"
                     android:gravity="center_horizontal"
                     android:text="@string/clear_result"
-                    android:textColor="@android:color/holo_red_light"
+                    android:textColor="@color/accent"
                     android:textSize="18sp" />
 
 

@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
     public static final String KEY_ACUTAL_ARTIFACT = "KEY_ACUTAL_ARTIFACT";
     public static final String KEY_CHECKED_NAV_MENU_ID = "KEY_CHECKED_NAV_MENU_ID";
     public static final String KEY_USER_STATISTICS = "KEY_USER_STATISTICS";
-    public static final int MIN_RSSI = -55;
+    public static final int MIN_RSSI = -100;
     public static final String KEY_USER_EMAIL = "KEY_USER_EMAIL";
     public static final String KEY_USER_ID = "KEY_USER_ID";
     public static final int REQUEST_PROFILE = 104;
@@ -528,8 +528,8 @@ public class MainActivity extends AppCompatActivity
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final BeaconData beaconData;
                             beaconData = dataSnapshot.getValue(BeaconData.class);
-                            beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
                             if (beaconData != null) {
+                                beaconData.setMinorID(Long.valueOf(dataSnapshot.getKey()));
                                 if (isAutomaticallyShowBeacon) {
                                     showExplorerFragmentByID(beaconData.getArtifactId(), true);
                                 } else {
